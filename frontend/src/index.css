@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apply overflow-x-hidden to html and body tags */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Custom full-width utility class */
+.full-width-container {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+}
+
+@layer base {
+  html {
+    font-family: 'Open Sans', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+  body {
+    @apply bg-gray-50 text-neutral m-0 min-h-screen;
+  }
+  a {
+    @apply text-primary font-medium;
+    text-decoration: inherit;
+  }
+  a:hover {
+    @apply text-blue-700;
+  }
+  button {
+    @apply bg-cta text-white font-medium rounded-lg px-4 py-2 cursor-pointer transition-colors;
+  }
+  button:hover {
+    @apply bg-red-600;
+  }
+}
