@@ -45,3 +45,38 @@ html, body {
     @apply bg-red-600;
   }
 }
+
+@layer utilities {
+  /* Always maintain white text on primary background elements */
+  .bg-primary {
+    @apply text-white;
+  }
+  .bg-primary:hover {
+    @apply text-white;
+  }
+
+  /* Ensure links with bg-primary maintain white text */
+  a.bg-primary,
+  button.bg-primary,
+  .btn.bg-primary,
+  .bg-primary a {
+    @apply text-white;
+  }
+
+  a.bg-primary:hover,
+  button.bg-primary:hover,
+  .btn.bg-primary:hover,
+  .bg-primary a:hover {
+    @apply text-white bg-blue-700;
+  }
+
+  /* Primary button class with consistent hover */
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-blue-700 hover:text-white;
+  }
+
+  /* Additional consistent button hover states */
+  .bg-primary:hover {
+    @apply bg-blue-700;
+  }
+}
