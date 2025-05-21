@@ -1,12 +1,98 @@
-# React + Vite
+# ListLaunchr Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for ListLaunchr, a platform for creating and managing giveaway campaigns.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# Install dependencies
+npm install
 
-## Expanding the ESLint configuration
+# Run development server
+npm run dev
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Build for production
+npm run build
+```
+
+## Tech Stack
+
+- React with Vite
+- React Router for navigation
+- Tailwind CSS for styling
+- Context API for state management
+
+## Styling Guidelines
+
+### CSS Architecture
+
+The project uses a combination of Tailwind CSS for utility-based styling and custom CSS for component-specific styles:
+
+1. **Global Styles**: `index.css` contains global styles, Tailwind directives, animations, and utility classes
+2. **Component-Specific Styles**: Separate CSS files for complex components (e.g., `DashboardLayout.css`)
+3. **Inline Tailwind Classes**: Most components use Tailwind utility classes directly in JSX
+
+### Button Styling
+
+We use different button styles based on their purpose:
+
+1. **Primary Buttons**: Blue gradient background with white text
+   ```jsx
+   <button className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-[8px] hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+     Button Text
+   </button>
+   ```
+
+2. **Action Buttons**: Green gradient for confirmation actions
+   ```jsx
+   <button className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-[8px] hover:shadow-lg">
+     Action Text
+   </button>
+   ```
+
+3. **Dashboard Buttons**: Use the dashboard-btn class within dashboard layouts
+   ```jsx
+   <button className="dashboard-btn text-gray-500 hover:text-primary">
+     Dashboard Button
+   </button>
+   ```
+
+4. **Default Buttons**: When no custom styling is needed, use btn-default class
+   ```jsx
+   <button className="btn-default">
+     Default Button
+   </button>
+   ```
+
+### Layout Structure
+
+1. **MainLayout**: Used for public-facing pages
+2. **DashboardLayout**: Used for authenticated user dashboard
+
+### Best Practices
+
+1. **Button Styling**: 
+   - Always use explicit Tailwind classes on buttons rather than relying on global button styles
+   - Use consistent gap and padding values within button groups
+   - Include proper disabled states with the `disabled` attribute and `disabled:` Tailwind variants
+
+2. **Custom Components**:
+   - Create dedicated UI components in the `/components/ui` directory for reusable elements
+   - Use the `className` prop to allow customization from parent components
+
+3. **Dashboard-Specific Styling**:
+   - All dashboard-specific styling should be in `DashboardLayout.css`
+   - Use the `.dashboard-container` parent class for scoping styles
+
+4. **Consistency**:
+   - Use the defined color palette in `tailwind.config.js` (primary, accent, neutral, etc.)
+   - Maintain consistent spacing, border-radius, and transition effects
+
+## Project Structure
+
+- `src/components`: Reusable UI components
+- `src/contexts`: React contexts for state management
+- `src/hooks`: Custom React hooks
+- `src/pages`: Page components
+- `src/utils`: Utility functions
+- `src/api`: API service layer

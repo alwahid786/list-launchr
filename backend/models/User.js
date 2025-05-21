@@ -37,6 +37,33 @@ const UserSchema = new mongoose.Schema({
     enum: ['free', 'pro'],
     default: 'free'
   },
+  // Stripe subscription fields
+  stripeCustomerId: {
+    type: String,
+    select: false
+  },
+  subscriptionId: {
+    type: String,
+    select: false
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['none', 'active', 'trialing', 'past_due', 'canceled', 'unpaid'],
+    default: 'none'
+  },
+  subscriptionEndsAt: {
+    type: Date
+  },
+  isPro: {
+    type: Boolean,
+    default: false
+  },
+  lastBillingDate: {
+    type: Date
+  },
+  nextBillingDate: {
+    type: Date
+  },
   emailVerified: {
     type: Boolean,
     default: false
@@ -78,6 +105,15 @@ UserSchema.methods.getSignedJwtToken = function() {
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Check if user has Pro access
+UserSchema.methods.hasProAccess = function() {
+  // User has Pro access if they are a Pro and their subscription is active/trialing
+  return this.isPro && 
+    (this.subscriptionStatus === 'active' || 
+     this.subscriptionStatus === 'trialing' || 
+     (this.subscriptionEndsAt && this.subscriptionEndsAt > new Date()));
 };
 
 module.exports = mongoose.model('User', UserSchema);

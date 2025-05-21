@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import { LoadingSpinner } from './ui';
 
 const AuthGuard = () => {
   const { currentUser, loading } = useAuth();
@@ -8,7 +9,7 @@ const AuthGuard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -29,7 +30,7 @@ export const ProGuard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -39,12 +40,12 @@ export const ProGuard = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // If not pro user, redirect to upgrade page
+  // If user doesn't have Pro access, redirect to upgrade page
   if (!isPro()) {
     return <Navigate to="/dashboard/upgrade" replace />;
   }
 
-  // If pro user, render the protected route
+  // User has Pro access, allow them to proceed
   return <Outlet />;
 };
 

@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
+import { LoadingSpinner } from '../ui';
 
-const FormStepWrapper = ({ children, isActive, transitionDirection }) => {
+const FormStepWrapper = (props) => {
+  // Destructure props with defaults for safety
+  const { 
+    children = null, 
+    isActive = true, 
+    transitionDirection = 'next', 
+    isLoading = false 
+  } = props;
+  
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -29,13 +38,22 @@ const FormStepWrapper = ({ children, isActive, transitionDirection }) => {
     className += ' current';
   }
   
+  // For debugging
+  console.log('FormStepWrapper', { isActive, transitionDirection, mounted, className });
+  
   if (!isActive && !mounted) {
     return null;
   }
   
   return (
     <div className={className}>
-      {children}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-24">
+          <LoadingSpinner size="lg" label="Loading step content..." />
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 };

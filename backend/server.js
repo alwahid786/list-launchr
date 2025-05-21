@@ -12,7 +12,25 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+
+// Special handling for Stripe webhooks
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/stripe/webhook') {
+    // Raw body for Stripe webhooks
+    let rawBody = '';
+    req.on('data', chunk => {
+      rawBody += chunk.toString();
+    });
+    req.on('end', () => {
+      req.rawBody = rawBody;
+      next();
+    });
+  } else {
+    // JSON body parsing for all other routes
+    express.json()(req, res, next);
+  }
+});
+
 app.use(express.urlencoded({ extended: true }));
 
 // Static files for file uploads
@@ -44,6 +62,8 @@ app.get('/', (req, res) => {
       app.use('/api/entries', require('./routes/entries'));
       app.use('/api/analytics', require('./routes/analytics'));
       app.use('/api/uploads', require('./routes/uploads'));
+      app.use('/api/integrations', require('./routes/integrations'));
+      app.use('/api/stripe', require('./routes/stripe'));
     } else {
       // Default response for all API routes if DB is not connected
       app.use('/api/auth', (req, res) => {
@@ -75,6 +95,20 @@ app.get('/', (req, res) => {
       });
       
       app.use('/api/uploads', (req, res) => {
+        res.status(503).json({
+          success: false,
+          message: 'Database connection not available. Please install MongoDB or update the connection string.'
+        });
+      });
+      
+      app.use('/api/integrations', (req, res) => {
+        res.status(503).json({
+          success: false,
+          message: 'Database connection not available. Please install MongoDB or update the connection string.'
+        });
+      });
+      
+      app.use('/api/stripe', (req, res) => {
         res.status(503).json({
           success: false,
           message: 'Database connection not available. Please install MongoDB or update the connection string.'
