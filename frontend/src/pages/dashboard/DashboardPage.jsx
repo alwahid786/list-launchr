@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { analyticsAPI } from '../../api';
+import { toast } from 'react-hot-toast';
 
 const DashboardPage = () => {
   const { currentUser } = useAuth();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [stats, setStats] = useState({
+    totalCampaigns: 0,
     activeCampaigns: 0,
     totalEntries: 0,
+    totalViews: 0,
     conversionRate: 0,
-    topReferrers: []
+    recentCampaigns: [],
+    loading: true,
+    error: null
   });
 
   useEffect(() => {
@@ -20,14 +26,38 @@ const DashboardPage = () => {
       localStorage.setItem('firstLogin', 'false');
     }
 
-    // Fetch dashboard stats - would normally come from API
-    // This is just placeholder data
-    setStats({
-      activeCampaigns: 0,
-      totalEntries: 0,
-      conversionRate: 0,
-      topReferrers: []
-    });
+    // Fetch dashboard stats
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await analyticsAPI.getDashboardStats();
+        
+        if (response.data && response.data.data) {
+          const data = response.data.data;
+          setStats({
+            totalCampaigns: data.totalCampaigns || 0,
+            activeCampaigns: data.activeCampaigns || 0,
+            totalEntries: data.totalEntries || 0,
+            totalViews: data.totalViews || 0,
+            conversionRate: data.conversionRate || 0,
+            recentCampaigns: data.recentCampaigns || [],
+            loading: false,
+            error: null
+          });
+        } else {
+          throw new Error("Invalid data format received from server");
+        }
+      } catch (err) {
+        console.error("Error fetching dashboard stats:", err);
+        setStats(prevStats => ({
+          ...prevStats,
+          loading: false,
+          error: err.message || "Failed to fetch dashboard statistics"
+        }));
+        toast.error("Failed to load dashboard statistics. Please try again later.");
+      }
+    };
+
+    fetchDashboardStats();
   }, []);
 
   const closeWelcomeModal = () => {
@@ -42,6 +72,21 @@ const DashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
+      {stats.error && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{stats.error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Active Campaigns */}
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -53,7 +98,11 @@ const DashboardPage = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Active Campaigns</p>
-              <p className="text-2xl font-semibold text-neutral">{stats.activeCampaigns}</p>
+              {stats.loading ? (
+                <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              ) : (
+                <p className="text-2xl font-semibold text-neutral">{stats.activeCampaigns}</p>
+              )}
             </div>
           </div>
         </div>
@@ -68,7 +117,31 @@ const DashboardPage = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Total Entries</p>
-              <p className="text-2xl font-semibold text-neutral">{stats.totalEntries}</p>
+              {stats.loading ? (
+                <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              ) : (
+                <p className="text-2xl font-semibold text-neutral">{stats.totalEntries.toLocaleString()}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Total Views */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-neutral-600">Total Views</p>
+              {stats.loading ? (
+                <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              ) : (
+                <p className="text-2xl font-semibold text-neutral">{stats.totalViews.toLocaleString()}</p>
+              )}
             </div>
           </div>
         </div>
@@ -83,22 +156,11 @@ const DashboardPage = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-neutral-600">Conversion Rate</p>
-              <p className="text-2xl font-semibold text-neutral">{stats.conversionRate}%</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Account Type */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-neutral-600">Account Type</p>
-              <p className="text-2xl font-semibold text-neutral capitalize">{currentUser?.accountType || 'Free'}</p>
+              {stats.loading ? (
+                <div className="animate-pulse h-8 w-16 bg-gray-200 rounded mt-1"></div>
+              ) : (
+                <p className="text-2xl font-semibold text-neutral">{stats.conversionRate.toFixed(1)}%</p>
+              )}
             </div>
           </div>
         </div>
@@ -146,8 +208,107 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* No Campaigns Message */}
-      {stats.activeCampaigns === 0 && (
+      {/* Recent Campaigns */}
+      {!stats.loading && stats.recentCampaigns && stats.recentCampaigns.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-8">
+          <h2 className="text-lg font-bold text-neutral mb-4">Recent Campaigns</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Campaign
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Entries
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Views
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Conversion
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {stats.recentCampaigns.map((campaign) => {
+                  const isActive = campaign.status === 'active';
+                  
+                  return (
+                    <tr key={campaign._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{campaign.title}</div>
+                            <div className="text-sm text-gray-500">
+                              {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${campaign.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            campaign.status === 'draft' ? 'bg-gray-100 text-gray-800' : 
+                            campaign.status === 'scheduled' ? 'bg-blue-100 text-blue-800' : 
+                            campaign.status === 'completed' ? 'bg-purple-100 text-purple-800' : 
+                            'bg-red-100 text-red-800'}`}>
+                          {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {campaign.stats?.entries || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {campaign.stats?.views || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {campaign.stats?.conversionRate || 0}%
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <Link
+                            to={`/dashboard/campaigns/${campaign._id}`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            View
+                          </Link>
+                          {isActive && campaign.slug && (
+                            <Link
+                              to={`/giveaway/${campaign.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-600 hover:text-green-900"
+                            >
+                              Public Link
+                            </Link>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {stats.totalCampaigns > stats.recentCampaigns.length && (
+              <div className="mt-4 text-center">
+                <Link
+                  to="/dashboard/campaigns"
+                  className="text-sm text-primary hover:text-primary-dark font-medium"
+                >
+                  View all {stats.totalCampaigns} campaigns →
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (!stats.loading && stats.activeCampaigns === 0) && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
           <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">

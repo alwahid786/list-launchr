@@ -3,16 +3,23 @@ import { useEffect, useState } from 'react';
 const ModernStepper = ({ steps, currentStep, onChange }) => {
   const [animatedSteps, setAnimatedSteps] = useState([]);
   
-  // Handle step entrance animations
+  // Handle step entrance animations - run only once when component mounts
   useEffect(() => {
     const newAnimatedSteps = [];
-    steps.forEach((step, index) => {
-      setTimeout(() => {
-        newAnimatedSteps.push(index);
-        setAnimatedSteps([...newAnimatedSteps]);
-      }, 100 * index);
-    });
-  }, [steps]);
+    const staggerAnimation = () => {
+      steps.forEach((step, index) => {
+        setTimeout(() => {
+          newAnimatedSteps.push(index);
+          setAnimatedSteps([...newAnimatedSteps]);
+        }, 100 * index);
+      });
+    };
+    
+    // Run animation only once
+    staggerAnimation();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Calculate progress percentage for progress bar
   const progressPercentage = ((currentStep - 1) / (steps.length - 1)) * 100;

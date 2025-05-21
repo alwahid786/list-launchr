@@ -38,6 +38,15 @@ const CampaignSchema = new mongoose.Schema({
     min: [1, 'Number of winners must be at least 1'],
     max: [100, 'Number of winners cannot be more than 100']
   },
+  winners: [{
+    entryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Entry'
+    },
+    email: String,
+    name: String,
+    points: Number
+  }],
   externalUrl: {
     type: String,
     trim: true,
@@ -107,13 +116,79 @@ const CampaignSchema = new mongoose.Schema({
         enabled: {
           type: Boolean,
           default: false
+        },
+        message: {
+          type: String,
+          default: ''
         }
       },
       twitter: {
         enabled: {
           type: Boolean,
           default: false
+        },
+        message: {
+          type: String,
+          default: ''
         }
+      },
+      linkedin: {
+        enabled: {
+          type: Boolean,
+          default: false
+        },
+        message: {
+          type: String,
+          default: ''
+        }
+      },
+      whatsapp: {
+        enabled: {
+          type: Boolean,
+          default: false
+        },
+        message: {
+          type: String,
+          default: ''
+        }
+      },
+      telegram: {
+        enabled: {
+          type: Boolean,
+          default: false
+        },
+        message: {
+          type: String,
+          default: ''
+        }
+      },
+      pinterest: {
+        enabled: {
+          type: Boolean,
+          default: false
+        },
+        message: {
+          type: String,
+          default: ''
+        }
+      },
+      email: {
+        enabled: {
+          type: Boolean,
+          default: false
+        },
+        subject: {
+          type: String,
+          default: ''
+        },
+        message: {
+          type: String,
+          default: ''
+        }
+      },
+      hashtags: {
+        type: String,
+        default: ''
       }
     },
     referral: {
@@ -158,7 +233,29 @@ const CampaignSchema = new mongoose.Schema({
     },
     apiKey: String,
     listId: String,
-    webhookUrl: String
+    formId: String,
+    tagId: String,
+    webhookUrl: String,
+    secretKey: String,
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    lastSynced: Date,
+    stats: {
+      totalSynced: {
+        type: Number,
+        default: 0
+      },
+      successCount: {
+        type: Number,
+        default: 0
+      },
+      failureCount: {
+        type: Number,
+        default: 0
+      }
+    }
   },
   // Coupon Reveal (optional)
   couponReveal: {

@@ -51,16 +51,24 @@ export const authAPI = {
 export const campaignAPI = {
   getCampaigns: () => api.get('/campaigns'),
   getCampaign: (id) => api.get(`/campaigns/${id}`),
+  getPublicCampaign: (slug) => axios.get(`${api.defaults.baseURL}/campaigns/public/${slug}`),
   createCampaign: (campaignData) => api.post('/campaigns', campaignData),
   updateCampaign: (id, campaignData) => api.put(`/campaigns/${id}`, campaignData),
+  updateCampaignStatus: (id, status) => api.put(`/campaigns/${id}/status`, { status }),
   deleteCampaign: (id) => api.delete(`/campaigns/${id}`),
   duplicateCampaign: (id) => api.post(`/campaigns/${id}/duplicate`),
+  selectWinners: (id) => api.post(`/campaigns/${id}/select-winners`),
 };
 
 // Entries API endpoints
 export const entriesAPI = {
   getEntries: (campaignId) => api.get(`/entries/${campaignId}`),
   createEntry: (entryData) => api.post('/entries', entryData),
+  createPublicEntry: (entryData) => axios.post(`${api.defaults.baseURL}/entries`, entryData),
+  submitEntryAction: (entryId, referralCode, actionData) => 
+    axios.post(`${api.defaults.baseURL}/entries/${entryId}/actions`, actionData, {
+      headers: { 'X-Referral-Code': referralCode }
+    }),
   exportEntries: (campaignId) => api.get(`/entries/${campaignId}/export`),
 };
 
@@ -68,6 +76,43 @@ export const entriesAPI = {
 export const analyticsAPI = {
   getCampaignStats: (campaignId) => api.get(`/analytics/campaign/${campaignId}`),
   getDashboardStats: () => api.get('/analytics/dashboard'),
+};
+
+// Upload API endpoints
+export const uploadAPI = {
+  uploadFile: (file, onUploadProgress = null) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    };
+    
+    // Add progress tracking if callback provided
+    if (onUploadProgress && typeof onUploadProgress === 'function') {
+      config.onUploadProgress = onUploadProgress;
+    }
+    
+    return api.post('/uploads', formData, config);
+  },
+};
+
+// Integration API endpoints
+export const integrationAPI = {
+  verifyIntegration: (data) => api.post('/integrations/verify', data),
+  updateCampaignIntegration: (campaignId, data) => api.put(`/integrations/campaign/${campaignId}`, data),
+  testSend: (data) => api.post('/integrations/test-send', data),
+  syncEntries: (campaignId) => api.post(`/integrations/sync/${campaignId}`),
+};
+
+// Stripe API endpoints
+export const stripeAPI = {
+  createCheckoutSession: () => api.post('/stripe/create-checkout-session'),
+  createPortalSession: () => api.post('/stripe/create-portal-session'),
+  getSubscriptionStatus: () => api.get('/stripe/subscription-status'),
+  verifySession: (sessionId) => api.get(`/stripe/verify-session/${sessionId}`),
 };
 
 export default api;
