@@ -6,6 +6,7 @@ import FormStepWrapper from '../../components/stepper/FormStepWrapper';
 import { ErrorPopup, LoadingSpinner, LoadingOverlay, SimpleFileUploader } from '../../components/ui';
 import { EmailIntegrationForm } from '../../components/integrations';
 import { SocialShareButtons } from '../../components/sharing';
+import { EntryActions } from '../../components/giveaway';
 import { campaignAPI } from '../../api';
 
 // Helper function to format image URLs
@@ -159,6 +160,13 @@ const PreviewStep = React.memo(({ formData, isPro }) => {
               >
                 {formData.design.ctaText || 'Enter Giveaway'}
               </button>
+              
+              {/* Entry Actions Preview */}
+              <EntryActions 
+                entryOptions={formData.entryOptions}
+                onActionComplete={() => {}} // Preview mode - no action needed
+                completedActions={[]} // Preview mode - show all as uncompleted
+              />
             </div>
           </div>
         </div>

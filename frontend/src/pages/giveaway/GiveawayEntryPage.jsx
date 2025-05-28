@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { campaignAPI, entriesAPI } from '../../api';
 import { SocialShareButtons, SocialShareButtonsWithText } from '../../components/sharing';
+import { EntryActions } from '../../components/giveaway';
 
 const GiveawayEntryPage = () => {
   const { slug } = useParams();
@@ -17,6 +18,7 @@ const GiveawayEntryPage = () => {
   const [referralCode, setReferralCode] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [entryId, setEntryId] = useState(null);
+  const [completedActions, setCompletedActions] = useState([]);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -75,11 +77,33 @@ const GiveawayEntryPage = () => {
       const response = await entriesAPI.createPublicEntry(entryData);
       
       // Save entry ID and referral code
-      setEntryId(response.data.data._id);
-      setReferralCode(response.data.data.referralCode);
+      const newEntryId = response.data.data._id;
+      const newReferralCode = response.data.data.referralCode;
+      setEntryId(newEntryId);
+      setReferralCode(newReferralCode);
       setSubmitted(true);
       
-      toast.success('Entry submitted successfully!');
+      // Submit any locally completed actions
+      if (completedActions.length > 0) {
+        try {
+          for (const actionKey of completedActions) {
+            const [actionType, platform] = actionKey.split('_');
+            const actionData = {
+              actionType,
+              platform: platform || null,
+              referralCode: newReferralCode
+            };
+            
+            await entriesAPI.submitEntryAction(newEntryId, actionData);
+          }
+          toast.success(`Entry submitted successfully! ${completedActions.length > 0 ? `+ ${completedActions.length} bonus entries!` : ''}`);
+        } catch (actionErr) {
+          console.error('Error submitting completed actions:', actionErr);
+          toast.success('Entry submitted successfully!');
+        }
+      } else {
+        toast.success('Entry submitted successfully!');
+      }
     } catch (err) {
       console.error('Error submitting entry:', err);
       toast.error(err.response?.data?.message || 'Failed to submit entry');
@@ -92,6 +116,33 @@ const GiveawayEntryPage = () => {
     const referralLink = `${window.location.origin}/giveaway/${slug}?ref=${referralCode}`;
     navigator.clipboard.writeText(referralLink);
     toast.success('Referral link copied to clipboard!');
+  };
+
+  const handleActionComplete = async (action) => {
+    const actionKey = action.platform ? `${action.type}_${action.platform}` : action.type;
+    
+    if (!completedActions.includes(actionKey) && entryId && referralCode) {
+      try {
+        const actionData = {
+          actionType: action.type,
+          platform: action.platform,
+          referralCode: referralCode
+        };
+        
+        await entriesAPI.submitEntryAction(entryId, actionData);
+        setCompletedActions(prev => [...prev, actionKey]);
+        toast.success('Action completed! You earned +1 entry.');
+      } catch (err) {
+        console.error('Error completing action:', err);
+        toast.error('Failed to register action completion');
+      }
+    } else if (!entryId || !referralCode) {
+      // For users who haven't submitted their email yet, just track locally
+      if (!completedActions.includes(actionKey)) {
+        setCompletedActions(prev => [...prev, actionKey]);
+        toast.success('Action completed! Submit your email to claim your entries.');
+      }
+    }
   };
 
   if (loading && !campaign) {
@@ -311,6 +362,13 @@ const GiveawayEntryPage = () => {
               <p className="text-sm text-gray-600 mb-6">
                 {campaign.description || 'Enter your email below to join this exciting giveaway.'}
               </p>
+              
+              {/* Entry Actions */}
+              <EntryActions 
+                entryOptions={campaign.entryOptions}
+                onActionComplete={handleActionComplete}
+                completedActions={completedActions}
+              />
               
               <div className="bg-white p-4 mb-4 border border-gray-200 rounded-md shadow-sm mx-auto">
                 <form onSubmit={handleSubmit}>

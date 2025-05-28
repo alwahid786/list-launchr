@@ -65,10 +65,8 @@ export const entriesAPI = {
   getEntries: (campaignId) => api.get(`/entries/${campaignId}`),
   createEntry: (entryData) => api.post('/entries', entryData),
   createPublicEntry: (entryData) => axios.post(`${api.defaults.baseURL}/entries`, entryData),
-  submitEntryAction: (entryId, referralCode, actionData) => 
-    axios.post(`${api.defaults.baseURL}/entries/${entryId}/actions`, actionData, {
-      headers: { 'X-Referral-Code': referralCode }
-    }),
+  submitEntryAction: (entryId, actionData) => 
+    axios.post(`${api.defaults.baseURL}/entries/${entryId}/actions`, actionData),
   exportEntries: (campaignId) => api.get(`/entries/${campaignId}/export`),
 };
 
