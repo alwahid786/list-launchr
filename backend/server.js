@@ -11,7 +11,11 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ["https://list-launchr.vercel.app", "http://localhost:5173"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Special handling for Stripe webhooks
 app.use((req, res, next) => {
