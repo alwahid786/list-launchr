@@ -1,2 +1,5 @@
 **/.claude/settings.local.json
 backend/.env
+frontend/.env
+# Ignore node_modules
+node_modules/
