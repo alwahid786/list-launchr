@@ -28,6 +28,8 @@ import GiveawayCreatePage from '../pages/giveaway/GiveawayCreatePage';
 import GiveawayEntryPage from '../pages/giveaway/GiveawayEntryPage';
 import PricingPage from '../pages/PricingPage';
 import ExamplesPage from '../pages/ExamplesPage';
+import ShopsPage from '../pages/ShopsPage';
+import LocalPage from '../pages/LocalPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 const Router = () => {
@@ -45,6 +47,8 @@ const Router = () => {
           <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/examples" element={<ExamplesPage />} />
+          <Route path="/shops" element={<ShopsPage />} />
+          <Route path="/local" element={<LocalPage />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="/giveaway/:slug" element={<GiveawayEntryPage />} />
         </Route>

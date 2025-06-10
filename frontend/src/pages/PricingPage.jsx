@@ -4,18 +4,22 @@ import useAuth from '../hooks/useAuth';
 
 const PricingPage = () => {
   const { currentUser, isPro } = useAuth();
-  const [annualBilling, setAnnualBilling] = useState(true);
   const [isVisible, setIsVisible] = useState({
     header: false,
     pricing: false,
-    enterprise: false,
-    faq: false
+    comparison: false,
+    testimonials: false,
+    faq: false,
+    cta: false
   });
+  const [openFaq, setOpenFaq] = useState(null);
 
   const headerRef = useRef(null);
   const pricingRef = useRef(null);
-  const enterpriseRef = useRef(null);
+  const comparisonRef = useRef(null);
+  const testimonialsRef = useRef(null);
   const faqRef = useRef(null);
+  const ctaRef = useRef(null);
 
   useEffect(() => {
     const observerOptions = {
@@ -40,84 +44,189 @@ const PricingPage = () => {
     
     if (headerRef.current) observer.observe(headerRef.current);
     if (pricingRef.current) observer.observe(pricingRef.current);
-    if (enterpriseRef.current) observer.observe(enterpriseRef.current);
+    if (comparisonRef.current) observer.observe(comparisonRef.current);
+    if (testimonialsRef.current) observer.observe(testimonialsRef.current);
     if (faqRef.current) observer.observe(faqRef.current);
+    if (ctaRef.current) observer.observe(ctaRef.current);
     
     return () => {
       if (headerRef.current) observer.unobserve(headerRef.current);
       if (pricingRef.current) observer.unobserve(pricingRef.current);
-      if (enterpriseRef.current) observer.unobserve(enterpriseRef.current);
+      if (comparisonRef.current) observer.unobserve(comparisonRef.current);
+      if (testimonialsRef.current) observer.unobserve(testimonialsRef.current);
       if (faqRef.current) observer.unobserve(faqRef.current);
+      if (ctaRef.current) observer.unobserve(ctaRef.current);
     };
   }, []);
 
-  const features = {
-    free: [
-      'One active campaign',
-      '500 max entries',
-      'Basic entry methods (email opt-in)',
-      'Share to earn entries',
-      'ListLaunchr branding on giveaways',
-      'Standard support',
-    ],
-    pro: [
-      'Unlimited campaigns',
-      '10,000 entries per campaign',
-      'All entry methods unlocked',
-      'Customizable design & branding',
-      'No ListLaunchr branding',
-      'Integrations with email platforms',
-      'Advanced analytics & reporting',
-      'Priority support',
-    ],
-  };
+  // Plan data
+  const plans = [
+    {
+      id: 'free',
+      name: 'Free Plan',
+      description: 'Great for testing things out or running a small launch. Collects emails but with limited customization.',
+      price: '$0',
+      period: '/mo',
+      color: 'gray',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      features: {
+        campaignCreation: 'DIY builder',
+        entryMethods: 'Basic only',
+        giveawayLandingPage: 'LL-branded only',
+        couponCodeReveal: false,
+        emailIntegrations: 'CSV download only',
+        adCampaigns: false,
+        monthlyNewsletter: false,
+        monthlyReporting: false,
+        support: 'Help Center Only'
+      },
+      cta: 'Get Started Free',
+      ctaLink: '/register'
+    },
+    {
+      id: 'pro',
+      name: 'Pro Plan',
+      description: 'Unlocks all platform features so you can run professional, branded giveaways and grow your audience fast.',
+      price: '$29',
+      period: '/mo',
+      color: 'blue',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+      features: {
+        campaignCreation: 'DIY builder',
+        entryMethods: 'All unlocked',
+        giveawayLandingPage: 'Branded + customized',
+        couponCodeReveal: true,
+        emailIntegrations: 'Mailchimp, MailerLite, ConvertKit, etc.',
+        adCampaigns: false,
+        monthlyNewsletter: 'Optional via DIY',
+        monthlyReporting: 'Real-time dashboard',
+        support: 'Priority Support'
+      },
+      cta: 'Upgrade to Pro',
+      ctaLink: '/dashboard/upgrade',
+      testimonial: {
+        content: "Pro plan helped me launch 5 successful campaigns last month. The custom branding made all the difference!",
+        author: "Sarah M.",
+        role: "Author & Creator"
+      }
+    },
+    {
+      id: 'local',
+      name: 'Local Pro+ Plan',
+      description: 'We do it all for you. Perfect for local businesses that want results without the tech or time commitment.',
+      price: 'Custom Quote',
+      period: '',
+      color: 'purple',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+      ),
+      features: {
+        campaignCreation: 'Fully managed by us',
+        entryMethods: 'All unlocked',
+        giveawayLandingPage: 'Custom & fully managed',
+        couponCodeReveal: true,
+        emailIntegrations: 'Full setup + sync',
+        adCampaigns: 'Done-for-you, targeted ads',
+        monthlyNewsletter: 'Written & sent for you',
+        monthlyReporting: 'Full reporting provided',
+        support: 'Dedicated Support Team'
+      },
+      cta: 'Ask About Local Pro+',
+      ctaLink: '/contact',
+      testimonial: {
+        content: "Local Pro+ saved me 20 hours a week and brought in 50 new leads this month. Worth every penny!",
+        author: "Mike R.",
+        role: "Local HVAC Business"
+      }
+    }
+  ];
 
-  const comparisons = [
-    { title: 'Number of Campaigns', free: '1', pro: 'Unlimited' },
-    { title: 'Entries per Campaign', free: '500', pro: '10,000' },
-    { title: 'Custom Branding', free: 'Limited', pro: 'Full Control' },
-    { title: 'Email Integrations', free: 'Basic', pro: '20+ Platforms' },
-    { title: 'Analytics', free: 'Basic', pro: 'Advanced' },
-    { title: 'Support', free: 'Email', pro: 'Priority' }
+  // Feature comparison data
+  const comparisonFeatures = [
+    { name: 'Campaign Creation', key: 'campaignCreation' },
+    { name: 'Entry Methods', key: 'entryMethods' },
+    { name: 'Giveaway Landing Page', key: 'giveawayLandingPage' },
+    { name: 'Coupon Code Reveal', key: 'couponCodeReveal' },
+    { name: 'Email Integrations', key: 'emailIntegrations' },
+    { name: 'Ad Campaigns', key: 'adCampaigns' },
+    { name: 'Monthly Newsletter Emails', key: 'monthlyNewsletter' },
+    { name: 'Monthly Reporting', key: 'monthlyReporting' },
+    { name: 'Support', key: 'support' }
   ];
 
   // FAQ data
   const faqs = [
     {
-      question: 'Can I upgrade anytime?',
-      answer: 'Yes, you can upgrade to the Pro plan at any time. Your new features will be available immediately.'
+      question: 'Can I switch plans anytime?',
+      answer: 'Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately and you\'ll be charged pro-rated amounts.'
     },
     {
-      question: 'What happens when I reach my entry limit?',
-      answer: 'Your giveaway will continue to run, but new entries won\'t be accepted until you upgrade your plan or until the next billing cycle.'
-    },
-    {
-      question: 'Can I cancel my subscription?',
-      answer: 'Yes, you can cancel your subscription at any time. You\'ll continue to have access to Pro features until the end of your billing period.'
+      question: 'What\'s included in the Local Pro+ custom quote?',
+      answer: 'Local Pro+ pricing depends on your needs - campaign frequency, ad spend, list size, and additional services. Most businesses invest $500-2000/month for full-service campaign management.'
     },
     {
       question: 'Do you offer refunds?',
-      answer: 'We offer a 14-day money-back guarantee. If you\'re not satisfied with our service, contact us for a full refund.'
+      answer: 'Yes, we offer a 30-day money-back guarantee on all paid plans. If you\'re not satisfied, contact us for a full refund.'
     },
     {
-      question: 'Can I export my email list?',
-      answer: 'Yes, you can export your collected emails at any time in CSV format. This feature is available on both Free and Pro plans.'
+      question: 'Can I cancel my subscription?',
+      answer: 'Yes, you can cancel anytime from your dashboard. You\'ll continue to have access to features until the end of your billing period.'
     },
     {
-      question: 'How do I select winners?',
-      answer: 'Our platform includes a random winner selection tool that ensures fair and transparent picking of winners based on valid entries.'
+      question: 'What payment methods do you accept?',
+      answer: 'We accept all major credit cards (Visa, MasterCard, American Express) and PayPal for convenient monthly or annual billing.'
+    },
+    {
+      question: 'Is there a setup fee?',
+      answer: 'No setup fees for Free or Pro plans. Local Pro+ may include a one-time setup fee depending on the complexity of your campaigns.'
     }
   ];
 
+  const getColorClasses = (color, variant = 'primary') => {
+    const colors = {
+      gray: {
+        primary: 'text-gray-600',
+        bg: 'bg-gray-50',
+        border: 'border-gray-200',
+        button: 'bg-gray-600 hover:bg-gray-700',
+        accent: 'bg-gray-100'
+      },
+      blue: {
+        primary: 'text-blue-600',
+        bg: 'bg-blue-50',
+        border: 'border-blue-200',
+        button: 'bg-blue-600 hover:bg-blue-700',
+        accent: 'bg-blue-100'
+      },
+      purple: {
+        primary: 'text-purple-600',
+        bg: 'bg-purple-50',
+        border: 'border-purple-200',
+        button: 'bg-purple-600 hover:bg-purple-700',
+        accent: 'bg-purple-100'
+      }
+    };
+    return colors[color]?.[variant] || colors.gray[variant];
+  };
+
   return (
     <div className="pt-24 bg-gray-50">
-      {/* Pricing Header */}
+      {/* Header Section */}
       <section
         ref={headerRef}
         data-section="header"
         className="relative overflow-hidden py-20"
       >
-        {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary opacity-10 blur-3xl"></div>
           <div className="absolute -left-40 -bottom-40 h-80 w-80 rounded-full bg-accent opacity-10 blur-3xl"></div>
@@ -127,13 +236,12 @@ const PricingPage = () => {
           <div className={`transition-all duration-1000 ${isVisible.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <span className="bg-blue-50 text-primary text-sm font-medium px-4 py-1.5 rounded-full">Pricing Plans</span>
             <h1 className="mt-6 text-4xl font-headline font-extrabold text-neutral sm:text-5xl md:text-6xl">
-              Grow Your Business with <span className="text-primary">ListLaunchr</span>
+              Plans That <span className="text-primary">Grow With You</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-xl text-neutral-600 mx-auto">
-              Choose the plan that's right for your growing business. No hidden fees or surprises.
+            <p className="mt-6 max-w-3xl text-xl text-neutral-600 mx-auto">
+              Whether you're just getting started or need a team to do it for you, there's a ListLaunchr plan designed to fit your goals.
             </p>
           </div>
-
         </div>
       </section>
 
@@ -144,230 +252,155 @@ const PricingPage = () => {
         className="py-20"
       >
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-headline font-extrabold text-neutral mb-2">
-              Select Your <span className="text-primary">Plan</span>
-            </h2>
-            <p className="text-lg text-neutral-600 max-w-xl mx-auto">
-              Choose the billing option that works best for you
-            </p>
-          </div>
-          <div className={`flex justify-center mb-12 transition-all duration-700 delay-100 ${isVisible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="relative bg-gray-50 rounded-full inline-flex p-1.5 border border-gray-200 shadow-inner">
-              <button
-                onClick={() => setAnnualBilling(true)}
-                className={`${
-                  annualBilling 
-                    ? 'text-white bg-primary shadow-md hover:bg-blue-700 hover:text-white' 
-                    : 'text-neutral-600 hover:text-primary hover:bg-gray-100'
-                } group relative py-2.5 px-6 text-sm font-medium rounded-full transition-all duration-300 focus:outline-none`}
+          <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {plans.map((plan, index) => (
+              <div 
+                key={plan.id}
+                className={`relative bg-white rounded-3xl shadow-xl overflow-hidden transition-all duration-700 transform hover:shadow-2xl hover:-translate-y-2 ${
+                  plan.popular ? 'ring-2 ring-blue-600 scale-105' : ''
+                } ${isVisible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ transitionDelay: `${index * 200}ms` }}
               >
-                Annual
-                <span className="absolute -top-3 right-0 bg-accent text-black px-3 py-1 rounded-full text-xs font-bold shadow-md animate-pulse">
-                  Save 20%
-                </span>
-                {!annualBilling && (
-                  <span className="absolute inset-0 bg-primary rounded-full opacity-0 transform scale-0 group-hover:opacity-10 group-hover:scale-100 transition-all duration-300"></span>
-                )}
-              </button>
-              <button
-                onClick={() => setAnnualBilling(false)}
-                className={`${
-                  !annualBilling 
-                    ? 'text-white bg-primary shadow-md hover:bg-blue-700 hover:text-white' 
-                    : 'text-neutral-600 hover:text-primary hover:bg-gray-100'
-                } group relative py-2.5 px-6 text-sm font-medium rounded-full transition-all duration-300 focus:outline-none`}
-              >
-                Monthly
-                {annualBilling && (
-                  <span className="absolute inset-0 bg-primary rounded-full opacity-0 transform scale-0 group-hover:opacity-10 group-hover:scale-100 transition-all duration-300"></span>
-                )}
-              </button>
-            </div>
-          </div>
-          <div className="md:flex md:space-x-12 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <div 
-              className={`flex-1 mb-8 md:mb-0 bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-500 transform hover:shadow-xl hover:-translate-y-1 hover:border-gray-300 ${
-                isVisible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
-              style={{ transitionDelay: '200ms' }}
-            >
-              <div className="p-8 border-b bg-gradient-to-r from-gray-50 to-white">
-                <div className="flex flex-col items-center text-center mb-4">
-                  <div className="h-14 w-14 bg-blue-50 rounded-full flex items-center justify-center mb-4 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                {plan.popular && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <span className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium shadow-lg">
+                      Most Popular
+                    </span>
                   </div>
-                  <h2 className="text-2xl font-bold text-neutral">Free Plan</h2>
-                  <p className="mt-1 text-neutral-600">Perfect for just getting started</p>
-                </div>
-                <div className="mt-6 flex items-baseline justify-center">
-                  <p className="text-5xl font-bold text-primary">$0</p>
-                  <span className="ml-1 text-xl font-normal text-neutral-600">/mo</span>
-                </div>
-                <p className="mt-1 text-sm text-neutral-600 text-center">Free forever, no credit card required</p>
-                <div className="mt-8">
-                  {currentUser ? (
-                    isPro() ? (
-                      <span className="inline-block w-full py-3 px-4 text-center text-sm font-medium text-neutral-600 bg-gray-100 rounded-full shadow-sm">
-                        Current Plan
-                      </span>
-                    ) : (
-                      <span className="inline-block w-full py-3 px-4 text-center text-sm font-medium text-primary bg-blue-50 rounded-full border border-blue-100 shadow-sm">
-                        Your Current Plan
-                      </span>
-                    )
-                  ) : (
+                )}
+                
+                <div className={`p-8 ${getColorClasses(plan.color, 'bg')} border-b`}>
+                  <div className="text-center">
+                    <div className={`w-16 h-16 ${getColorClasses(plan.color, 'accent')} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                      <div className={getColorClasses(plan.color, 'primary')}>
+                        {plan.icon}
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-neutral mb-2">{plan.name}</h3>
+                    <p className="text-neutral-600 text-sm mb-6">{plan.description}</p>
+                    <div className="mb-6">
+                      <span className="text-5xl font-bold text-neutral">{plan.price}</span>
+                      {plan.period && <span className="text-xl text-neutral-600">{plan.period}</span>}
+                    </div>
                     <Link
-                      to="/register"
-                      className="block w-full py-3 px-4 text-center text-sm font-medium text-white bg-primary hover:bg-blue-700 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                      to={plan.ctaLink}
+                      className={`block w-full py-3 px-6 text-center font-medium rounded-full text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${getColorClasses(plan.color, 'button')}`}
                     >
-                      Get Started
+                      {plan.cta}
                     </Link>
-                  )}
+                  </div>
                 </div>
-              </div>
-              <div className="p-8 pt-6">
-                <h3 className="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-4 text-center">What's included:</h3>
-                <ul className="space-y-4 mt-6">
-                  {features.free.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg
-                        className="h-5 w-5 text-primary mt-0.5 mr-3 flex-shrink-0"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
 
-            {/* Pro Plan */}
-            <div 
-              className={`flex-1 bg-white rounded-2xl shadow-lg overflow-hidden border border-blue-100 relative transition-all duration-500 transform ${
-                isVisible.pricing ? 'opacity-100' : 'opacity-0 translate-y-10'
-              } hover:shadow-xl hover:-translate-y-1 hover:border-blue-200`}
-              style={{ transitionDelay: '400ms' }}
-            >
-              <div className="p-8 border-b bg-gradient-to-r from-blue-50/50 to-white">
-                <div className="flex flex-col items-center text-center mb-4">
-                  <div className="h-14 w-14 bg-blue-100 rounded-full flex items-center justify-center mb-4 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                {/* Testimonial for Pro and Local Pro+ */}
+                {plan.testimonial && (
+                  <div className="p-6 bg-gray-50 border-b">
+                    <div className="flex text-yellow-400 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <p className="text-neutral-700 text-sm italic mb-2">"{plan.testimonial.content}"</p>
+                    <p className="text-neutral-600 text-xs font-medium">
+                      {plan.testimonial.author} - {plan.testimonial.role}
+                    </p>
                   </div>
-                  <h2 className="text-2xl font-bold text-primary">Pro Plan</h2>
-                  <p className="mt-1 text-neutral-600">Recommended for businesses</p>
-                </div>
-                <div className="mt-6 flex items-baseline justify-center">
-                  <p className="text-5xl font-bold text-primary">
-                    ${annualBilling ? '8' : '9'}
-                  </p>
-                  <span className="ml-1 text-xl font-normal text-neutral-600">/mo</span>
-                </div>
-                <p className="mt-1 text-sm text-neutral-600 text-center">
-                  {annualBilling ? 'Billed annually ($96/year)' : 'Billed monthly'}
-                </p>
-                <div className="mt-8">
-                  {currentUser ? (
-                    isPro() ? (
-                      <span className="inline-block w-full py-3 px-4 text-center text-sm font-medium text-white bg-primary rounded-full shadow-md">
-                        Your Current Plan
-                      </span>
-                    ) : (
-                      <Link
-                        to="/dashboard/upgrade"
-                        className="block w-full py-3 px-4 text-center text-sm font-medium text-white bg-primary hover:bg-blue-700 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-                      >
-                        Upgrade Now
-                      </Link>
-                    )
-                  ) : (
-                    <Link
-                      to="/register"
-                      className="block w-full py-3 px-4 text-center text-sm font-medium text-white bg-primary hover:bg-blue-700 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-                    >
-                      Get Started
-                    </Link>
-                  )}
-                </div>
+                )}
               </div>
-              <div className="p-8 pt-6">
-                <h3 className="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-4 text-center">What's included:</h3>
-                <ul className="space-y-4 mt-6">
-                  {features.pro.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg
-                        className="h-5 w-5 text-primary mt-0.5 mr-3 flex-shrink-0"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Feature Comparison Table */}
-      <section className="py-16 bg-white">
+      <section
+        ref={comparisonRef}
+        data-section="comparison"
+        className="py-20 bg-white"
+      >
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
-          <div className={`text-center mb-12 transition-all duration-1000 ${isVisible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h2 className="text-3xl font-headline font-extrabold text-neutral">
-              Compare <span className="text-primary">Plans</span>
+          <div className={`text-center mb-16 transition-all duration-1000 ${isVisible.comparison ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <h2 className="text-3xl font-headline font-extrabold text-neutral sm:text-4xl">
+              Plan <span className="text-primary">Comparison</span>
             </h2>
             <p className="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto">
-              See which plan is right for your needs
+              See exactly what's included in each plan
             </p>
           </div>
 
-          <div className={`overflow-x-auto transition-all duration-1000 delay-300 ${isVisible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <table className="min-w-full bg-white rounded-xl overflow-hidden shadow-lg">
+          <div className={`overflow-x-auto transition-all duration-1000 delay-300 ${isVisible.comparison ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <table className="min-w-full bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-200">
               <thead>
-                <tr>
-                  <th className="py-4 px-6 bg-gray-50 text-left text-sm font-medium text-neutral-600 uppercase tracking-wider border-b">
+                <tr className="bg-gray-50">
+                  <th className="py-4 px-6 text-left text-sm font-semibold text-neutral-800 uppercase tracking-wider">
                     Feature
                   </th>
-                  <th className="py-4 px-6 bg-gray-50 text-center text-sm font-medium text-neutral-600 uppercase tracking-wider border-b w-1/4">
-                    Free
+                  <th className="py-4 px-6 text-center text-sm font-semibold text-neutral-800 uppercase tracking-wider">
+                    Free Plan
                   </th>
-                  <th className="py-4 px-6 bg-primary bg-opacity-10 text-center text-sm font-medium text-primary uppercase tracking-wider border-b w-1/4">
-                    Pro
+                  <th className="py-4 px-6 text-center text-sm font-semibold text-blue-600 uppercase tracking-wider bg-blue-50">
+                    Pro Plan
+                  </th>
+                  <th className="py-4 px-6 text-center text-sm font-semibold text-purple-600 uppercase tracking-wider bg-purple-50">
+                    Local Pro+
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {comparisons.map((comparison, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="py-4 px-6 text-left text-sm font-medium text-neutral-800 border-b border-gray-100">
-                      {comparison.title}
+                <tr className="border-b border-gray-100">
+                  <td className="py-4 px-6 font-semibold text-neutral-800">Price</td>
+                  <td className="py-4 px-6 text-center text-neutral-600">$0/mo</td>
+                  <td className="py-4 px-6 text-center font-medium text-neutral-800 bg-blue-50/50">$29/mo</td>
+                  <td className="py-4 px-6 text-center font-medium text-neutral-800 bg-purple-50/50">Custom Quote</td>
+                </tr>
+                {comparisonFeatures.map((feature, index) => (
+                  <tr key={feature.key} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="py-4 px-6 font-medium text-neutral-800">{feature.name}</td>
+                    <td className="py-4 px-6 text-center text-sm">
+                      {typeof plans[0].features[feature.key] === 'boolean' ? (
+                        plans[0].features[feature.key] ? (
+                          <svg className="h-5 w-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )
+                      ) : (
+                        <span className="text-neutral-600">{plans[0].features[feature.key]}</span>
+                      )}
                     </td>
-                    <td className="py-4 px-6 text-center text-sm text-neutral-600 border-b border-gray-100">
-                      {comparison.free}
+                    <td className="py-4 px-6 text-center text-sm bg-blue-50/50">
+                      {typeof plans[1].features[feature.key] === 'boolean' ? (
+                        plans[1].features[feature.key] ? (
+                          <svg className="h-5 w-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )
+                      ) : (
+                        <span className="font-medium text-neutral-800">{plans[1].features[feature.key]}</span>
+                      )}
                     </td>
-                    <td className="py-4 px-6 text-center text-sm font-medium text-neutral-800 border-b border-gray-100 bg-primary bg-opacity-5">
-                      {comparison.pro}
+                    <td className="py-4 px-6 text-center text-sm bg-purple-50/50">
+                      {typeof plans[2].features[feature.key] === 'boolean' ? (
+                        plans[2].features[feature.key] ? (
+                          <svg className="h-5 w-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )
+                      ) : (
+                        <span className="font-medium text-neutral-800">{plans[2].features[feature.key]}</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -377,59 +410,21 @@ const PricingPage = () => {
         </div>
       </section>
 
-      {/* Enterprise Section */}
-      <section
-        ref={enterpriseRef}
-        data-section="enterprise"
-        className="py-16 bg-gradient-to-r from-primary to-blue-700 text-white"
-      >
+      {/* Downsell Section */}
+      <section className="py-16 bg-gray-50">
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
-          <div className={`md:flex md:items-center md:justify-between md:space-x-12 transition-all duration-1000 ${isVisible.enterprise ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="md:w-1/2 mb-10 md:mb-0">
-              <span className="inline-block bg-white/20 text-white text-sm font-medium px-4 py-1.5 rounded-full backdrop-blur-sm">Enterprise Solutions</span>
-              <h2 className="mt-6 text-3xl font-headline font-extrabold text-white sm:text-4xl">
-                Need a custom plan for your business?
-              </h2>
-              <p className="mt-4 text-xl text-white max-w-2xl font-medium">
-                We offer custom solutions for high-volume users, agencies, and enterprise customers. Our team will work with you to create a plan that fits your specific needs.
+          <div className={`max-w-4xl mx-auto text-center transition-all duration-1000 ${isVisible.comparison ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+              <h3 className="text-2xl font-bold text-neutral mb-4">Not quite ready for Local Pro+?</h3>
+              <p className="text-lg text-neutral-600 mb-6">
+                Try our Pro Plan first — it unlocks everything you need to run powerful local campaigns yourself, without the full service commitment.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-white rounded-full shadow-lg text-base font-medium text-primary bg-white hover:bg-gray-50 transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                >
-                  Contact Sales
-                </Link>
-                <a 
-                  href="mailto:enterprise@listlaunchr.com" 
-                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-white rounded-full text-base font-medium text-white hover:bg-white/10 transition-all duration-300"
-                >
-                  Email Us
-                </a>
-              </div>
-            </div>
-            <div className="md:w-1/2">
-              <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 border border-white/30 shadow-lg">
-                <h3 className="text-xl font-bold text-white mb-4">Enterprise features include:</h3>
-                <ul className="space-y-4">
-                  {[
-                    'Unlimited entries per campaign',
-                    'White-label solution',
-                    'Advanced API access',
-                    'Custom integrations',
-                    'Dedicated account manager',
-                    '24/7 priority support',
-                    'Custom analytics & reporting'
-                  ].map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white mt-0.5 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Link
+                to="/dashboard/upgrade"
+                className="inline-flex items-center px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Start with Pro Plan
+              </Link>
             </div>
           </div>
         </div>
@@ -439,80 +434,87 @@ const PricingPage = () => {
       <section
         ref={faqRef}
         data-section="faq"
-        className="py-24 bg-gray-50"
+        className="py-24 bg-white"
       >
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
           <div className={`text-center mb-16 transition-all duration-1000 ${isVisible.faq ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <span className="bg-blue-50 text-primary text-sm font-medium px-4 py-1.5 rounded-full">Questions & Answers</span>
-            <h2 className="mt-8 text-3xl font-headline font-extrabold text-neutral sm:text-4xl">
-              Frequently Asked Questions
+            <h2 className="text-3xl font-headline font-extrabold text-neutral sm:text-4xl">
+              Frequently Asked <span className="text-primary">Questions</span>
             </h2>
             <p className="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto">
-              Everything you need to know about our pricing plans and features
+              Everything you need to know about our pricing plans
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             {faqs.map((faq, index) => (
               <div 
-                key={index} 
-                className={`bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 transition-all duration-700 ${isVisible.faq ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                key={index}
+                className={`mb-4 transition-all duration-700 ${isVisible.faq ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <h3 className="font-bold text-xl mb-4 text-neutral">{faq.question}</h3>
-                <p className="text-neutral-600 leading-relaxed">{faq.answer}</p>
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-neutral pr-4">{faq.question}</h3>
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className={`h-5 w-5 text-primary transition-transform duration-300 flex-shrink-0 ${openFaq === index ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  {openFaq === index && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <p className="text-neutral-600 leading-relaxed">{faq.answer}</p>
+                    </div>
+                  )}
+                </button>
               </div>
             ))}
-          </div>
-
-          <div className={`mt-16 text-center transition-all duration-1000 delay-500 ${isVisible.faq ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <p className="text-neutral-600 mb-6 max-w-2xl mx-auto">
-              Still have questions? We're here to help.
-            </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-8 py-4 rounded-full shadow-md text-base font-medium text-white bg-primary hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-            >
-              Contact Support
-            </Link>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white">
+      <section
+        ref={ctaRef}
+        data-section="cta"
+        className="py-24 bg-gradient-to-br from-primary to-blue-700"
+      >
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
-          <div className="max-w-5xl mx-auto">
-            <div className={`bg-gradient-to-r from-primary to-blue-600 rounded-3xl p-12 text-center shadow-xl overflow-hidden relative transition-all duration-1000 delay-700 ${isVisible.faq ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            {/* Background Design Elements */}
-            <div className="absolute inset-0 overflow-hidden opacity-30">
-              <div className="absolute -left-10 top-0 h-72 w-72 rounded-full bg-white blur-3xl"></div>
-              <div className="absolute right-10 bottom-10 h-40 w-40 rounded-full bg-accent blur-2xl"></div>
+          <div className={`text-center transition-all duration-1000 ${isVisible.cta ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <h2 className="text-3xl font-headline font-extrabold text-white sm:text-4xl mb-6">
+              Ready to Launch Your First Giveaway?
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-10">
+              Choose the plan that fits your needs and start growing your audience today.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <Link
+                to="/register"
+                className="px-8 py-4 text-lg font-medium rounded-full bg-white text-primary hover:bg-gray-100 shadow-xl transition-all duration-300 hover:shadow-2xl transform hover:scale-105"
+              >
+                Get Started Free
+              </Link>
+              <Link
+                to="/dashboard/upgrade"
+                className="px-8 py-4 text-lg font-medium rounded-full bg-blue-600 hover:bg-blue-800 text-white shadow-lg transition-all duration-300"
+              >
+                Upgrade to Pro
+              </Link>
+              <Link
+                to="/contact"
+                className="px-8 py-4 text-lg font-medium rounded-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary transition-all duration-300"
+              >
+                Ask About Local Pro+
+              </Link>
             </div>
-            
-            <div className="relative">
-              <h2 className="text-3xl font-headline font-extrabold text-white sm:text-4xl mb-6">
-                Ready to Grow Your Email List?
-              </h2>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-10">
-                Start creating your first giveaway campaign today. No credit card required.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link
-                  to="/register"
-                  className="px-8 py-4 text-base font-medium rounded-full bg-white text-primary hover:bg-gray-50 shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  to="/examples"
-                  className="px-8 py-4 text-base font-medium rounded-full bg-transparent border-2 border-white text-white hover:bg-white/10 transition-all duration-300 shadow-md"
-                >
-                  View Examples
-                </Link>
-              </div>
-            </div>
-          </div>
           </div>
         </div>
       </section>
