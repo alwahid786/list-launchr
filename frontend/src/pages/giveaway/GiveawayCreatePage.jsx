@@ -762,10 +762,10 @@ const GiveawayCreatePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-neutral-600 mb-1">
-              Start Date <span className="text-red-500">*</span>
+              Start Date & Time <span className="text-red-500">*</span>
             </label>
             <input
-              type="date"
+              type="datetime-local"
               id="startDate"
               name="startDate"
               value={formData.startDate}
@@ -777,10 +777,10 @@ const GiveawayCreatePage = () => {
           
           <div>
             <label htmlFor="endDate" className="block text-sm font-medium text-neutral-600 mb-1">
-              End Date <span className="text-red-500">*</span>
+              End Date & Time <span className="text-red-500">*</span>
             </label>
             <input
-              type="date"
+              type="datetime-local"
               id="endDate"
               name="endDate"
               value={formData.endDate}

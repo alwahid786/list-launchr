@@ -322,9 +322,33 @@ const syncEntries = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @desc    Get user's integrations
+ * @route   GET /api/integrations
+ * @access  Private
+ */
+const getIntegrations = asyncHandler(async (req, res) => {
+  try {
+    const integrations = await Integration.find({ user: req.user.id })
+      .populate('campaign', 'title')
+      .select('-apiKey -secretKey'); // Don't send sensitive data
+    
+    res.json({
+      success: true,
+      data: integrations
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 module.exports = {
   verifyIntegration,
   updateCampaignIntegration,
   testSend,
-  syncEntries
+  syncEntries,
+  getIntegrations
 };

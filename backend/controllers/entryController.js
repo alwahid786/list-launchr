@@ -403,3 +403,65 @@ exports.exportEntries = async (req, res) => {
     });
   }
 };
+
+// @desc    Export all user entries as CSV
+// @route   GET /api/entries/export/csv
+// @access  Private
+exports.exportAllEntries = async (req, res) => {
+  try {
+    // Get all user's campaigns
+    const campaigns = await Campaign.find({ user: req.user.id }).select('_id title');
+    
+    if (!campaigns || campaigns.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No campaigns found'
+      });
+    }
+    
+    const campaignIds = campaigns.map(c => c._id);
+    
+    // Get all entries for user's campaigns
+    const entries = await Entry.find({ campaign: { $in: campaignIds } })
+      .populate('campaign', 'title')
+      .sort('-createdAt');
+    
+    if (!entries || entries.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No entries found'
+      });
+    }
+    
+    // Generate CSV header
+    let csv = 'Campaign,Email,Name,Newsletter Opt-in,Entry Method,Points,Entry Date\n';
+    
+    // Add entry data
+    entries.forEach(entry => {
+      const row = [
+        `"${entry.campaign?.title || 'Unknown Campaign'}"`,
+        `"${entry.email}"`,
+        `"${entry.name || ''}"`,
+        entry.newsletterOptIn ? 'Yes' : 'No',
+        entry.entryMethod || 'email',
+        entry.points || 1,
+        new Date(entry.createdAt).toLocaleString()
+      ];
+      
+      csv += row.join(',') + '\n';
+    });
+    
+    // Set headers for file download
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=all_entries_${new Date().toISOString().split('T')[0]}.csv`);
+    
+    // Send the CSV file
+    res.status(200).send(csv);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};

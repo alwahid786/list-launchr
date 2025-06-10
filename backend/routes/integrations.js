@@ -4,26 +4,22 @@ const {
   verifyIntegration, 
   updateCampaignIntegration, 
   testSend, 
-  syncEntries 
+  syncEntries,
+  getIntegrations
 } = require('../controllers/integrationController');
 const { protect } = require('../middleware/auth');
 const { requireProAccess, requireFeature } = require('../middleware/proAccess');
 
-// All routes require authentication and Pro access
+// All routes require authentication
 router.use(protect);
-router.use(requireProAccess);
-router.use(requireFeature('emailIntegrations'));
 
-// Integration verification route
-router.post('/verify', verifyIntegration);
+// Get user's integrations (available to all users)
+router.get('/', getIntegrations);
 
-// Test send route
-router.post('/test-send', testSend);
-
-// Update campaign integration
-router.put('/campaign/:id', updateCampaignIntegration);
-
-// Sync entries
-router.post('/sync/:id', syncEntries);
+// Pro-only routes
+router.post('/verify', requireProAccess, requireFeature('emailIntegrations'), verifyIntegration);
+router.post('/test-send', requireProAccess, requireFeature('emailIntegrations'), testSend);
+router.put('/campaign/:id', requireProAccess, requireFeature('emailIntegrations'), updateCampaignIntegration);
+router.post('/sync/:id', requireProAccess, requireFeature('emailIntegrations'), syncEntries);
 
 module.exports = router;
