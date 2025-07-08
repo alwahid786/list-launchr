@@ -163,6 +163,33 @@ class MailerLiteAdapter extends BaseAdapter {
   }
 
   /**
+   * Get all groups from MailerLite
+   * @returns {Promise<Object>} Groups information
+   */
+  async getLists() {
+    try {
+      const groups = await this.makeRequest('GET', '/groups');
+      
+      return {
+        success: true,
+        message: 'Groups retrieved successfully',
+        data: groups.map(group => ({
+          id: group.id,
+          name: group.name,
+          subscriberCount: group.total,
+          active: group.active
+        }))
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+        data: []
+      };
+    }
+  }
+
+  /**
    * Get information about the MailerLite account and groups
    * @returns {Promise<Object>} Provider specific information
    */

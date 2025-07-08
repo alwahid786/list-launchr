@@ -228,7 +228,7 @@ const CampaignSchema = new mongoose.Schema({
   integrations: {
     provider: {
       type: String,
-      enum: ['none', 'mailchimp', 'mailerlite', 'convertkit', 'webhook'],
+      enum: ['none', 'mailchimp', 'mailerlite', 'convertkit', 'sendgrid', 'webhook'],
       default: 'none'
     },
     apiKey: String,

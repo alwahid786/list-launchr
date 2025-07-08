@@ -1,6 +1,7 @@
 const Entry = require('../models/Entry');
 const Campaign = require('../models/Campaign');
 const User = require('../models/User');
+const { AdapterFactory } = require('../utils/integrations');
 
 // @desc    Create a new entry
 // @route   POST /api/entries
@@ -120,6 +121,93 @@ exports.createEntry = async (req, res) => {
     }
     
     await campaign.save();
+
+    // Auto-sync to email service if configured
+    if (campaign.integrations && campaign.integrations.provider !== 'none' && campaign.integrations.isVerified) {
+      try {
+        // Get the campaign owner's email service configuration
+        const campaignOwnerWithServices = await User.findById(campaign.user).select('+emailServices');
+        
+        if (campaignOwnerWithServices.emailServices && 
+            campaignOwnerWithServices.emailServices.get(campaign.integrations.provider)?.connected) {
+          
+          const serviceConfig = campaignOwnerWithServices.emailServices.get(campaign.integrations.provider);
+          
+          // Create adapter for the provider
+          const adapter = AdapterFactory.createAdapter(campaign.integrations.provider, {
+            apiKey: serviceConfig.apiKey,
+            listId: campaign.integrations.listId,
+            formId: campaign.integrations.formId,
+            tagId: campaign.integrations.tagId,
+            webhookUrl: campaign.integrations.webhookUrl,
+            secretKey: campaign.integrations.secretKey
+          });
+          
+          // Prepare subscriber data
+          const subscriberData = {
+            email: newEntry.email,
+            firstName: newEntry.name ? newEntry.name.split(' ')[0] : '',
+            lastName: newEntry.name ? newEntry.name.split(' ').slice(1).join(' ') : '',
+            source: `ListLaunchr: ${campaign.title}`,
+            campaignId: campaign._id.toString()
+          };
+          
+          // Add subscriber to email service
+          const result = await adapter.addSubscriber(subscriberData);
+          
+          if (result.success) {
+            // Update campaign integration stats
+            if (!campaign.integrations.stats) {
+              campaign.integrations.stats = {
+                totalSynced: 0,
+                successCount: 0,
+                failureCount: 0
+              };
+            }
+            
+            campaign.integrations.stats.totalSynced += 1;
+            campaign.integrations.stats.successCount += 1;
+            campaign.integrations.lastSynced = new Date();
+            
+            await campaign.save();
+            
+            console.log(`Successfully synced entry ${newEntry.email} to ${campaign.integrations.provider}`);
+          } else {
+            // Update failure stats
+            if (!campaign.integrations.stats) {
+              campaign.integrations.stats = {
+                totalSynced: 0,
+                successCount: 0,
+                failureCount: 0
+              };
+            }
+            
+            campaign.integrations.stats.totalSynced += 1;
+            campaign.integrations.stats.failureCount += 1;
+            
+            await campaign.save();
+            
+            console.error(`Failed to sync entry ${newEntry.email} to ${campaign.integrations.provider}:`, result.message);
+          }
+        }
+      } catch (error) {
+        console.error(`Error syncing entry to email service:`, error);
+        
+        // Update failure stats
+        if (!campaign.integrations.stats) {
+          campaign.integrations.stats = {
+            totalSynced: 0,
+            successCount: 0,
+            failureCount: 0
+          };
+        }
+        
+        campaign.integrations.stats.totalSynced += 1;
+        campaign.integrations.stats.failureCount += 1;
+        
+        await campaign.save();
+      }
+    }
     
     // Return entry data
     const returnData = {

@@ -67,6 +67,7 @@ app.get('/', (req, res) => {
       app.use('/api/analytics', require('./routes/analytics'));
       app.use('/api/uploads', require('./routes/uploads'));
       app.use('/api/integrations', require('./routes/integrations'));
+      app.use('/api/email-services', require('./routes/emailServices'));
       app.use('/api/stripe', require('./routes/stripe'));
     } else {
       // Default response for all API routes if DB is not connected
@@ -113,6 +114,13 @@ app.get('/', (req, res) => {
       });
       
       app.use('/api/stripe', (req, res) => {
+        res.status(503).json({
+          success: false,
+          message: 'Database connection not available. Please install MongoDB or update the connection string.'
+        });
+      });
+      
+      app.use('/api/email-services', (req, res) => {
         res.status(503).json({
           success: false,
           message: 'Database connection not available. Please install MongoDB or update the connection string.'

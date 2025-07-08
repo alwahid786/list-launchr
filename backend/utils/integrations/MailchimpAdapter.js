@@ -12,10 +12,16 @@ class MailchimpAdapter extends BaseAdapter {
     // Extract API key and data center from config
     this.apiKey = config.apiKey;
     
+    if (!this.apiKey) {
+      throw new Error('Mailchimp API key is required');
+    }
+    
     // Extract datacenter from API key (format: xxxx-us1)
-    const [, datacenter] = this.apiKey.split('-');
-    if (!datacenter) {
-      throw new Error('Invalid Mailchimp API key format. Expected format: xxxx-us1');
+    const apiKeyParts = this.apiKey.split('-');
+    const datacenter = apiKeyParts[apiKeyParts.length - 1]; // Get last part after last dash
+    
+    if (!datacenter || apiKeyParts.length < 2) {
+      throw new Error('Invalid Mailchimp API key format. Expected format: xxxx-us1 (should end with datacenter like -us1, -us2, etc.)');
     }
     
     this.baseUrl = `https://${datacenter}.api.mailchimp.com/3.0`;
@@ -47,33 +53,77 @@ class MailchimpAdapter extends BaseAdapter {
       
       return response.data;
     } catch (error) {
-      const message = error.response?.data?.detail || error.message;
+      let message = 'Unknown error occurred';
+      
+      if (error.response) {
+        // API responded with error status
+        const status = error.response.status;
+        const errorData = error.response.data;
+        
+        if (status === 401) {
+          message = 'Invalid API key or unauthorized access';
+        } else if (status === 404) {
+          message = 'Resource not found - please check your API key format (should end with datacenter like -us1)';
+        } else if (errorData?.detail) {
+          message = errorData.detail;
+        } else if (errorData?.title) {
+          message = errorData.title;
+        } else {
+          message = `HTTP ${status} error`;
+        }
+      } else if (error.request) {
+        message = 'Network error - please check your internet connection';
+      } else {
+        message = error.message;
+      }
+      
       throw new Error(`Mailchimp API error: ${message}`);
     }
   }
 
   /**
-   * Verify API credentials and list existence
-   * @returns {Promise<Object>} Result with verification status and list info
+   * Verify API credentials and optionally list existence
+   * @returns {Promise<Object>} Result with verification status and account info
    */
   async verify() {
     try {
+      console.log(`Verifying Mailchimp API key with baseUrl: ${this.baseUrl}`);
+      
       // Check if we can access the API and get account info
       const accountInfo = await this.makeRequest('GET', '/');
       
-      // Check if the list/audience exists
-      const listInfo = await this.makeRequest('GET', `/lists/${this.listId}`);
+      console.log('Mailchimp account info received:', {
+        account_name: accountInfo.account_name,
+        email: accountInfo.email
+      });
+      
+      let listInfo = null;
+      
+      // If list ID is provided, verify it exists
+      if (this.listId) {
+        try {
+          listInfo = await this.makeRequest('GET', `/lists/${this.listId}`);
+        } catch (listError) {
+          return {
+            success: false,
+            message: `Valid API key, but list ID ${this.listId} not found`
+          };
+        }
+      }
       
       return {
         success: true,
         message: 'Mailchimp integration verified successfully',
         data: {
           account: accountInfo.account_name,
-          listName: listInfo.name,
-          memberCount: listInfo.stats.member_count
+          email: accountInfo.email,
+          listName: listInfo ? listInfo.name : null,
+          memberCount: listInfo ? listInfo.stats.member_count : null,
+          totalLists: accountInfo.total_subscribers || 0
         }
       };
     } catch (error) {
+      console.error('Mailchimp verification error:', error.message);
       return {
         success: false,
         message: error.message
@@ -177,7 +227,33 @@ class MailchimpAdapter extends BaseAdapter {
   }
 
   /**
-   * Get information about the Mailchimp account and list
+   * Get all lists/audiences from Mailchimp
+   * @returns {Promise<Object>} Lists information
+   */
+  async getLists() {
+    try {
+      const response = await this.makeRequest('GET', '/lists');
+      
+      return {
+        success: true,
+        message: 'Lists retrieved successfully',
+        data: response.lists.map(list => ({
+          id: list.id,
+          name: list.name,
+          memberCount: list.stats.member_count
+        }))
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+        data: []
+      };
+    }
+  }
+
+  /**
+   * Get information about the Mailchimp account and optionally a specific list
    * @returns {Promise<Object>} Provider specific information
    */
   async getProviderInfo() {
@@ -185,20 +261,30 @@ class MailchimpAdapter extends BaseAdapter {
       // Get account info
       const accountInfo = await this.makeRequest('GET', '/');
       
-      // Get list info
-      const listInfo = await this.makeRequest('GET', `/lists/${this.listId}`);
+      let listInfo = null;
+      
+      // If list ID is provided, get specific list info
+      if (this.listId) {
+        try {
+          listInfo = await this.makeRequest('GET', `/lists/${this.listId}`);
+        } catch (listError) {
+          // If specific list fails, still return account info
+          console.warn(`Could not fetch list ${this.listId}:`, listError.message);
+        }
+      }
       
       return {
         success: true,
         message: 'Provider information retrieved successfully',
         data: {
           account: accountInfo.account_name,
-          accountType: accountInfo.type,
-          listName: listInfo.name,
-          listId: listInfo.id,
-          memberCount: listInfo.stats.member_count,
-          openRate: listInfo.stats.open_rate,
-          clickRate: listInfo.stats.click_rate
+          email: accountInfo.email,
+          accountType: accountInfo.type || 'unknown',
+          listName: listInfo ? listInfo.name : null,
+          listId: listInfo ? listInfo.id : null,
+          memberCount: listInfo ? listInfo.stats.member_count : null,
+          openRate: listInfo ? listInfo.stats.open_rate : null,
+          clickRate: listInfo ? listInfo.stats.click_rate : null
         }
       };
     } catch (error) {

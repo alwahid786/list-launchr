@@ -68,6 +68,22 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  emailServices: {
+    type: Map,
+    of: {
+      apiKey: String,
+      connected: {
+        type: Boolean,
+        default: false
+      },
+      connectedAt: Date,
+      accountInfo: {
+        type: mongoose.Schema.Types.Mixed
+      }
+    },
+    default: {},
+    select: false
+  },
   verificationToken: String,
   resetPasswordToken: String,
   resetPasswordExpire: Date,

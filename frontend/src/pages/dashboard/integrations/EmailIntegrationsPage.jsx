@@ -5,18 +5,49 @@ import api from '../../../api';
 
 const EmailIntegrationsPage = () => {
   const { currentUser, isPro } = useAuth();
-  const [integrations, setIntegrations] = useState([]);
+  const [connectedServices, setConnectedServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [connectingProvider, setConnectingProvider] = useState(null);
   const [showApiForm, setShowApiForm] = useState(null);
-  const [apiCredentials, setApiCredentials] = useState({
-    apiKey: '',
-    listId: '',
-    webhookUrl: ''
-  });
+  const [apiKey, setApiKey] = useState('');
+  const [testEmail, setTestEmail] = useState('');
+  const [testing, setTesting] = useState(null);
 
-  // Define available integrations based on membership level
+  // Define available integrations based on API-key support
+  const supportedIntegrations = [
+    {
+      id: 'mailchimp',
+      name: 'Mailchimp',
+      description: 'Connect with Mailchimp to sync subscribers to your audience lists automatically',
+      icon: '🐵',
+      color: 'yellow',
+      available: isPro(),
+      logoUrl: 'https://cdn.worldvectorlogo.com/logos/mailchimp-freddie-icon.svg',
+      instructions: 'Enter your Mailchimp API key. You can find this in your Mailchimp account under Account > Extras > API keys.'
+    },
+    {
+      id: 'mailerlite',
+      name: 'MailerLite',
+      description: 'Connect with MailerLite to grow your subscriber lists effortlessly',
+      icon: '✉️',
+      color: 'green',
+      available: isPro(),
+      logoUrl: 'https://www.mailerlite.com/favicon.ico',
+      instructions: 'Enter your MailerLite API key. You can find this in your MailerLite account under Integrations > Developer API.'
+    },
+    {
+      id: 'sendgrid',
+      name: 'SendGrid',
+      description: 'Integrate with SendGrid for reliable email delivery and contact management',
+      icon: '⚡',
+      color: 'blue',
+      available: isPro(),
+      logoUrl: 'https://sendgrid.com/favicon.ico',
+      instructions: 'Enter your SendGrid API key. You can create one in your SendGrid account under Settings > API Keys.'
+    }
+  ];
+
   const freeIntegrations = [
     {
       id: 'csv',
@@ -29,95 +60,19 @@ const EmailIntegrationsPage = () => {
     }
   ];
 
-  const proIntegrations = [
-    {
-      id: 'mailchimp',
-      name: 'Mailchimp',
-      description: 'Automatically sync subscribers to your Mailchimp audience lists',
-      icon: '🐵',
-      color: 'yellow',
-      available: isPro(),
-      logoUrl: 'https://cdn.worldvectorlogo.com/logos/mailchimp-freddie-icon.svg'
-    },
-    {
-      id: 'mailerlite',
-      name: 'MailerLite',
-      description: 'Connect with MailerLite to grow your subscriber lists effortlessly',
-      icon: '✉️',
-      color: 'green',
-      available: isPro(),
-      logoUrl: 'https://www.mailerlite.com/favicon.ico'
-    },
-    {
-      id: 'aweber',
-      name: 'AWeber',
-      description: 'Integrate with AWeber to automate your email marketing campaigns',
-      icon: '📧',
-      color: 'orange',
-      available: isPro(),
-      logoUrl: 'https://www.aweber.com/favicon.ico'
-    },
-    {
-      id: 'campaignmonitor',
-      name: 'Campaign Monitor',
-      description: 'Sync subscribers directly to your Campaign Monitor lists',
-      icon: '📊',
-      color: 'blue',
-      available: isPro(),
-      logoUrl: 'https://www.campaignmonitor.com/favicon.ico'
-    },
-    {
-      id: 'kit',
-      name: 'Kit (ConvertKit)',
-      description: 'Add subscribers to your Kit forms and sequences automatically',
-      icon: '🔧',
-      color: 'pink',
-      available: isPro(),
-      logoUrl: 'https://convertkit.com/favicon.ico'
-    },
-    {
-      id: 'emma',
-      name: 'Emma',
-      description: 'Connect with Emma to manage your email marketing workflows',
-      icon: '💌',
-      color: 'purple',
-      available: isPro(),
-      logoUrl: 'https://myemma.com/favicon.ico'
-    },
-    {
-      id: 'sendgrid',
-      name: 'SendGrid',
-      description: 'Integrate with SendGrid for reliable email delivery and management',
-      icon: '⚡',
-      color: 'blue',
-      available: isPro(),
-      logoUrl: 'https://sendgrid.com/favicon.ico'
-    },
-    {
-      id: 'webhook',
-      name: 'Custom Webhook',
-      description: 'Send subscriber data to any custom endpoint or API',
-      icon: '🔗',
-      color: 'gray',
-      available: isPro(),
-      type: 'webhook'
-    }
-  ];
-
-  const allIntegrations = [...freeIntegrations, ...proIntegrations];
-
   useEffect(() => {
-    fetchIntegrations();
+    fetchConnectedServices();
   }, []);
 
-  const fetchIntegrations = async () => {
+  const fetchConnectedServices = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/integrations');
-      setIntegrations(response.data.data || []);
+      const response = await api.get('/email-services');
+      console.log('Connected services response:', response.data);
+      setConnectedServices(response.data.data || []);
     } catch (err) {
-      setError('Failed to load integrations');
-      console.error('Integration fetch error:', err);
+      setError('Failed to load connected services');
+      console.error('Connected services fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -151,38 +106,99 @@ const EmailIntegrationsPage = () => {
     }
 
     setShowApiForm(provider.id);
-    setApiCredentials({ apiKey: '', listId: '', webhookUrl: '' });
+    setApiKey('');
+    setTestEmail('');
+    setError(null);
   };
 
   const handleSaveIntegration = async (providerId) => {
+    if (!apiKey.trim()) {
+      setError('API key is required');
+      return;
+    }
+
     try {
       setConnectingProvider(providerId);
+      setError(null);
       
-      const data = {
+      const response = await api.post('/email-services/connect', {
         provider: providerId,
-        ...apiCredentials
-      };
-
-      const response = await api.post('/integrations/verify', data);
+        apiKey: apiKey.trim()
+      });
+      
+      console.log('Connection response:', response.data);
       
       if (response.data.success) {
-        await fetchIntegrations();
+        console.log('Connection successful, fetching updated services...');
+        await fetchConnectedServices();
         setShowApiForm(null);
-        setApiCredentials({ apiKey: '', listId: '', webhookUrl: '' });
+        setApiKey('');
+        setTestEmail('');
+        console.log('Connected services updated');
       } else {
-        setError(response.data.message || 'Failed to verify integration');
+        setError(response.data.message || 'Failed to connect service');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to connect integration');
+      setError(err.response?.data?.message || 'Failed to connect service');
       console.error('Integration connection error:', err);
     } finally {
       setConnectingProvider(null);
     }
   };
 
-  const getConnectionStatus = (providerId) => {
-    const integration = integrations.find(int => int.provider === providerId);
-    return integration?.isVerified ? 'connected' : 'not-connected';
+  const handleDisconnect = async (providerId) => {
+    if (!window.confirm(`Are you sure you want to disconnect ${providerId}?`)) {
+      return;
+    }
+
+    try {
+      const response = await api.delete(`/email-services/${providerId}`);
+      
+      if (response.data.success) {
+        await fetchConnectedServices();
+      } else {
+        setError(response.data.message || 'Failed to disconnect service');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to disconnect service');
+      console.error('Disconnect error:', err);
+    }
+  };
+
+  const handleTest = async (providerId) => {
+    if (!testEmail.trim()) {
+      setError('Test email is required');
+      return;
+    }
+
+    try {
+      setTesting(providerId);
+      setError(null);
+      
+      const response = await api.post(`/email-services/${providerId}/test`, {
+        email: testEmail.trim(),
+        name: 'Test User'
+      });
+      
+      if (response.data.success) {
+        alert(`Test successful! ${response.data.message}`);
+      } else {
+        setError(response.data.message || 'Test failed');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Test failed');
+      console.error('Test error:', err);
+    } finally {
+      setTesting(null);
+    }
+  };
+
+  const isConnected = (providerId) => {
+    return connectedServices.some(service => service.provider === providerId);
+  };
+
+  const getConnectedService = (providerId) => {
+    return connectedServices.find(service => service.provider === providerId);
   };
 
   const getColorClasses = (color) => {
@@ -217,9 +233,9 @@ const EmailIntegrationsPage = () => {
     <div className="max-w-6xl mx-auto">
       <div className="bg-white shadow-sm rounded-lg">
         <div className="px-6 py-8 border-b border-gray-200">
-          <h2 className="text-3xl font-bold text-gray-900">Email Integrations</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Email Services</h2>
           <p className="mt-2 text-gray-600">
-            Connect your giveaway campaigns with email marketing services to automatically sync subscribers.
+            Connect your email marketing services to automatically sync subscribers from your giveaway campaigns.
           </p>
           
           {/* Membership Level Info */}
@@ -237,7 +253,7 @@ const EmailIntegrationsPage = () => {
                     <span className="ml-2">
                       <Link to="/dashboard/upgrade" className="underline font-medium">
                         Upgrade to Pro
-                      </Link> to unlock all email integrations.
+                      </Link> to unlock email service integrations.
                     </span>
                   )}
                 </p>
@@ -268,7 +284,7 @@ const EmailIntegrationsPage = () => {
                 <IntegrationCard
                   key={integration.id}
                   integration={integration}
-                  status={getConnectionStatus(integration.id)}
+                  connected={false}
                   onConnect={() => handleConnect(integration)}
                   connecting={connectingProvider === integration.id}
                   colorClasses={getColorClasses(integration.color)}
@@ -280,7 +296,7 @@ const EmailIntegrationsPage = () => {
           {/* Pro Plan Section */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Pro Plan</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Pro Plan - Email Services</h3>
               {!isPro() && (
                 <Link
                   to="/dashboard/upgrade"
@@ -291,12 +307,14 @@ const EmailIntegrationsPage = () => {
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {proIntegrations.map((integration) => (
+              {supportedIntegrations.map((integration) => (
                 <IntegrationCard
                   key={integration.id}
                   integration={integration}
-                  status={getConnectionStatus(integration.id)}
+                  connected={isConnected(integration.id)}
+                  connectedService={getConnectedService(integration.id)}
                   onConnect={() => handleConnect(integration)}
+                  onDisconnect={() => handleDisconnect(integration.id)}
                   connecting={connectingProvider === integration.id}
                   colorClasses={getColorClasses(integration.color)}
                 />
@@ -306,60 +324,47 @@ const EmailIntegrationsPage = () => {
         </div>
       </div>
 
-      {/* API Credentials Modal */}
+      {/* API Key Connection Modal */}
       {showApiForm && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Configure {allIntegrations.find(i => i.id === showApiForm)?.name}
+                Connect {supportedIntegrations.find(i => i.id === showApiForm)?.name}
               </h3>
               
               <div className="space-y-4">
-                {showApiForm !== 'webhook' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        API Key
-                      </label>
-                      <input
-                        type="password"
-                        value={apiCredentials.apiKey}
-                        onChange={(e) => setApiCredentials({...apiCredentials, apiKey: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Enter your API key"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        List/Audience ID
-                      </label>
-                      <input
-                        type="text"
-                        value={apiCredentials.listId}
-                        onChange={(e) => setApiCredentials({...apiCredentials, listId: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Enter list or audience ID"
-                      />
-                    </div>
-                  </>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    API Key
+                  </label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter your API key"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {supportedIntegrations.find(i => i.id === showApiForm)?.instructions}
+                  </p>
+                </div>
                 
-                {showApiForm === 'webhook' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Webhook URL
-                    </label>
-                    <input
-                      type="url"
-                      value={apiCredentials.webhookUrl}
-                      onChange={(e) => setApiCredentials({...apiCredentials, webhookUrl: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      placeholder="https://your-endpoint.com/webhook"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Test Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={testEmail}
+                    onChange={(e) => setTestEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    placeholder="test@example.com"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter an email to test the connection after connecting
+                  </p>
+                </div>
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
@@ -371,11 +376,20 @@ const EmailIntegrationsPage = () => {
                 </button>
                 <button
                   onClick={() => handleSaveIntegration(showApiForm)}
-                  disabled={connectingProvider === showApiForm}
+                  disabled={connectingProvider === showApiForm || !apiKey.trim()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {connectingProvider === showApiForm ? 'Connecting...' : 'Save & Test'}
+                  {connectingProvider === showApiForm ? 'Connecting...' : 'Connect Service'}
                 </button>
+                {testEmail && (
+                  <button
+                    onClick={() => handleTest(showApiForm)}
+                    disabled={testing === showApiForm || !testEmail.trim()}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {testing === showApiForm ? 'Testing...' : 'Test'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -386,9 +400,15 @@ const EmailIntegrationsPage = () => {
 };
 
 // Integration Card Component
-const IntegrationCard = ({ integration, status, onConnect, connecting, colorClasses }) => {
-  const isConnected = status === 'connected';
-  
+const IntegrationCard = ({ 
+  integration, 
+  connected, 
+  connectedService,
+  onConnect, 
+  onDisconnect,
+  connecting, 
+  colorClasses 
+}) => {
   return (
     <div className={`border rounded-lg p-6 transition-all duration-200 hover:shadow-md ${
       integration.available ? 'hover:border-blue-300' : 'opacity-60'
@@ -415,7 +435,7 @@ const IntegrationCard = ({ integration, status, onConnect, connecting, colorClas
           </div>
           <div className="ml-3">
             <h3 className="text-lg font-medium text-gray-900">{integration.name}</h3>
-            {isConnected && (
+            {connected && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                 Connected
               </span>
@@ -427,7 +447,7 @@ const IntegrationCard = ({ integration, status, onConnect, connecting, colorClas
           {!integration.available && (
             <span className="text-xs text-gray-500 mr-2">Pro Only</span>
           )}
-          {isConnected ? (
+          {connected ? (
             <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -441,20 +461,40 @@ const IntegrationCard = ({ integration, status, onConnect, connecting, colorClas
       
       <p className="mt-3 text-sm text-gray-600">{integration.description}</p>
       
-      <div className="mt-4">
+      {connected && connectedService && (
+        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+          <p className="text-sm text-green-800">
+            <strong>Account:</strong> {connectedService.accountInfo?.account || connectedService.accountInfo?.name || 'Connected'}
+          </p>
+          <p className="text-xs text-green-600">
+            Connected on {new Date(connectedService.connectedAt).toLocaleDateString()}
+          </p>
+        </div>
+      )}
+      
+      <div className="mt-4 space-y-2">
         <button
-          onClick={onConnect}
+          onClick={connected ? onConnect : onConnect}
           disabled={!integration.available || connecting}
           className={`w-full py-2 px-4 rounded-md text-sm font-medium transition-colors ${
             integration.available
-              ? isConnected
+              ? connected
                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           } ${connecting ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          {connecting ? 'Connecting...' : isConnected ? 'Reconfigure' : `Connect ${integration.name}`}
+          {connecting ? 'Connecting...' : connected ? 'Reconfigure' : `Connect ${integration.name}`}
         </button>
+        
+        {connected && (
+          <button
+            onClick={onDisconnect}
+            className="w-full py-1 px-4 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+          >
+            Disconnect
+          </button>
+        )}
       </div>
     </div>
   );

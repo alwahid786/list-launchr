@@ -13,7 +13,7 @@ const IntegrationSchema = new mongoose.Schema({
   },
   provider: {
     type: String,
-    enum: ['none', 'mailchimp', 'convertkit', 'mailerlite', 'webhook'],
+    enum: ['none', 'mailchimp', 'convertkit', 'mailerlite', 'sendgrid', 'webhook'],
     required: true
   },
   // General fields

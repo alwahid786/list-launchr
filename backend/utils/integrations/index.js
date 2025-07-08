@@ -3,6 +3,7 @@ const BaseAdapter = require('./BaseAdapter');
 const MailchimpAdapter = require('./MailchimpAdapter');
 const ConvertKitAdapter = require('./ConvertKitAdapter');
 const MailerLiteAdapter = require('./MailerLiteAdapter');
+const SendGridAdapter = require('./SendGridAdapter');
 const WebhookAdapter = require('./WebhookAdapter');
 
 module.exports = {
@@ -11,5 +12,6 @@ module.exports = {
   MailchimpAdapter,
   ConvertKitAdapter,
   MailerLiteAdapter,
+  SendGridAdapter,
   WebhookAdapter
 };

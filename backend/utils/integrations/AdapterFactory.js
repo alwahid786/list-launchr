@@ -1,6 +1,7 @@
 const MailchimpAdapter = require('./MailchimpAdapter');
 const ConvertKitAdapter = require('./ConvertKitAdapter');
 const MailerLiteAdapter = require('./MailerLiteAdapter');
+const SendGridAdapter = require('./SendGridAdapter');
 const WebhookAdapter = require('./WebhookAdapter');
 
 /**
@@ -23,6 +24,9 @@ class AdapterFactory {
       
       case 'mailerlite':
         return new MailerLiteAdapter(config);
+      
+      case 'sendgrid':
+        return new SendGridAdapter(config);
       
       case 'webhook':
         return new WebhookAdapter(config);

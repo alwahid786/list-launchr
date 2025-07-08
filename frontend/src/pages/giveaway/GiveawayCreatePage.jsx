@@ -4,7 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import ModernStepper from '../../components/stepper/ModernStepper';
 import FormStepWrapper from '../../components/stepper/FormStepWrapper';
 import { ErrorPopup, LoadingSpinner, LoadingOverlay, SimpleFileUploader } from '../../components/ui';
-import { EmailIntegrationForm } from '../../components/integrations';
+import { CampaignEmailIntegration } from '../../components/integrations';
 import { SocialShareButtons } from '../../components/sharing';
 import { EntryActions } from '../../components/giveaway';
 import { campaignAPI } from '../../api';
@@ -407,12 +407,7 @@ const GiveawayCreatePage = () => {
     // Step 5: Integrations
     integrations: {
       provider: 'none',
-      apiKey: '',
-      listId: '',
-      formId: '',
-      tagId: '',
-      webhookUrl: '',
-      secretKey: ''
+      listId: ''
     },
     
     // Coupon Reveal
@@ -1728,7 +1723,7 @@ const GiveawayCreatePage = () => {
             </div>
           </div>
         ) : (
-          <EmailIntegrationForm 
+          <CampaignEmailIntegration 
             initialValues={formData.integrations}
             onSave={handleIntegrationChange}
           />
