@@ -34,7 +34,32 @@ class SendGridAdapter extends BaseAdapter {
       
       return response.data;
     } catch (error) {
-      const message = error.response?.data?.errors?.[0]?.message || error.message;
+      let message = 'Unknown error occurred';
+      
+      if (error.response) {
+        // API responded with error status
+        const status = error.response.status;
+        const errorData = error.response.data;
+        
+        if (status === 401) {
+          message = 'Invalid API key or unauthorized access';
+        } else if (status === 403) {
+          message = 'Access forbidden - please check your API key permissions';
+        } else if (status === 404) {
+          message = 'Resource not found - please check your configuration';
+        } else if (errorData?.errors?.[0]?.message) {
+          message = errorData.errors[0].message;
+        } else if (errorData?.message) {
+          message = errorData.message;
+        } else {
+          message = `HTTP ${status} error`;
+        }
+      } else if (error.request) {
+        message = 'Network error - please check your internet connection';
+      } else {
+        message = error.message;
+      }
+      
       throw new Error(`SendGrid API error: ${message}`);
     }
   }
@@ -45,8 +70,15 @@ class SendGridAdapter extends BaseAdapter {
    */
   async verify() {
     try {
+      console.log('Verifying SendGrid API key...');
+      
       // Check if we can access the API and get account info
       const accountInfo = await this.makeRequest('GET', '/user/account');
+      
+      console.log('SendGrid account info received:', {
+        account: accountInfo.name || accountInfo.username,
+        email: accountInfo.email
+      });
       
       // If list ID is provided, verify it exists
       let listInfo = null;
@@ -65,13 +97,15 @@ class SendGridAdapter extends BaseAdapter {
         success: true,
         message: 'SendGrid integration verified successfully',
         data: {
-          account: accountInfo.name || accountInfo.username,
+          account: accountInfo.name || accountInfo.username || 'SendGrid Account',
           email: accountInfo.email,
+          type: accountInfo.type || 'Standard',
           listName: listInfo ? listInfo.name : null,
           contactCount: listInfo ? listInfo.contact_count : null
         }
       };
     } catch (error) {
+      console.error('SendGrid verification error:', error.message);
       return {
         success: false,
         message: error.message
@@ -88,28 +122,25 @@ class SendGridAdapter extends BaseAdapter {
     try {
       const { email, firstName, lastName } = subscriber;
       
-      // Prepare contact data
+      // Prepare contact data according to current API format
       const contactData = {
         email,
         first_name: firstName || '',
         last_name: lastName || ''
       };
       
-      // Add contact to SendGrid
-      const response = await this.makeRequest('PUT', '/marketing/contacts', {
+      // Prepare request payload with optional list assignment
+      const requestData = {
         contacts: [contactData]
-      });
+      };
       
-      // If list ID is provided, add contact to list
-      if (this.listId && response.job_id) {
-        // Wait a moment for contact to be processed
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Add contact to list
-        await this.makeRequest('POST', `/marketing/lists/${this.listId}/contacts`, {
-          contacts: [email]
-        });
+      // If list ID is provided, include it in the request to add contact directly to list
+      if (this.listId) {
+        requestData.list_ids = [this.listId];
       }
+      
+      // Add contact to SendGrid using the current API format
+      const response = await this.makeRequest('PUT', '/marketing/contacts', requestData);
       
       return {
         success: true,
@@ -165,13 +196,16 @@ class SendGridAdapter extends BaseAdapter {
     try {
       const listsResponse = await this.makeRequest('GET', '/marketing/lists?page_size=100');
       
+      // Handle the response format: { result: [...], _metadata: {...} }
+      const lists = listsResponse.result || [];
+      
       return {
         success: true,
         message: 'Lists retrieved successfully',
-        data: listsResponse.result.map(list => ({
+        data: lists.map(list => ({
           id: list.id,
           name: list.name,
-          contactCount: list.contact_count
+          contactCount: list.contact_count || 0
         }))
       };
     } catch (error) {
@@ -194,6 +228,7 @@ class SendGridAdapter extends BaseAdapter {
       
       // Get lists
       const listsResponse = await this.makeRequest('GET', '/marketing/lists?page_size=100');
+      const lists = listsResponse.result || [];
       
       return {
         success: true,
@@ -201,10 +236,10 @@ class SendGridAdapter extends BaseAdapter {
         data: {
           account: accountInfo.name || accountInfo.username,
           email: accountInfo.email,
-          lists: listsResponse.result.map(list => ({
+          lists: lists.map(list => ({
             id: list.id,
             name: list.name,
-            contactCount: list.contact_count
+            contactCount: list.contact_count || 0
           }))
         }
       };
