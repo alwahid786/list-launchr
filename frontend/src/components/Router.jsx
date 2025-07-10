@@ -30,6 +30,8 @@ import PricingPage from '../pages/PricingPage';
 import ExamplesPage from '../pages/ExamplesPage';
 import ShopsPage from '../pages/ShopsPage';
 import LocalPage from '../pages/LocalPage';
+import AuthorsPage from '../pages/AuthorsPage';
+import InfluencersPage from '../pages/InfluencersPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 const Router = () => {
@@ -49,6 +51,8 @@ const Router = () => {
           <Route path="/examples" element={<ExamplesPage />} />
           <Route path="/shops" element={<ShopsPage />} />
           <Route path="/local" element={<LocalPage />} />
+          <Route path="/authors" element={<AuthorsPage />} />
+          <Route path="/influencers" element={<InfluencersPage />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="/giveaway/:slug" element={<GiveawayEntryPage />} />
         </Route>
