@@ -80,7 +80,7 @@ const LocalPage = () => {
     {
       number: 1,
       title: "Pick Your Prize",
-      description: "Choose a giveaway that local customers care about",
+      description: "Choose a giveaway that local customers care about, we help you with this.",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -90,7 +90,7 @@ const LocalPage = () => {
     {
       number: 2,
       title: "Launch the Campaign",
-      description: "Use our tool or let us do the work",
+      description: "We create, launch and manage email campaigns for your company each and every month.",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -100,7 +100,7 @@ const LocalPage = () => {
     {
       number: 3,
       title: "Grow Your List",
-      description: "Gain leads through viral sharing and referrals",
+      description: "You'll gain leads through viral sharing and referrals, this will grow your email list month-over-month.",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -110,7 +110,7 @@ const LocalPage = () => {
     {
       number: 4,
       title: "Stay Top of Mind",
-      description: "Send monthly offers with our built-in email tools or service",
+      description: "We send your monthly newsletters and offers crafted around your business to generate more paying customers.",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -261,23 +261,23 @@ const LocalPage = () => {
                   </div>
                 </h1>
                 <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-lg lg:text-lg xl:text-xl text-neutral-600 font-medium max-w-3xl leading-relaxed">
-                  We run the campaign. You get more emails, followers, and leads from local customers who want what you offer.
+                With a Local Pro+ account, we run everything for you. You get more emails, followers, leads from local customers, oh and we send out monthly newsletters for you as well. Connect with customers who want what you offer.
                 </p>
                 <div className="mt-6 sm:mt-8 lg:mt-10 flex flex-col sm:flex-row gap-4">
                   <Link
                     to="/register"
                     className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-full shadow-xl text-white bg-purple-600 hover:bg-purple-700 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl md:text-lg lg:text-lg xl:text-lg md:px-10 relative overflow-hidden group"
                   >
-                    <span className="relative z-10">Launch Free Giveaway</span>
+                    <span className="relative z-10">Book a Call </span>
                   </Link>
                   <button
                     className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-full text-purple-600 bg-transparent border-2 border-purple-600 hover:bg-purple-50 transition-all duration-300 shadow-md md:text-lg lg:text-lg xl:text-lg md:px-10"
                   >
-                    Book a Call
+                    Try It Yourself
                   </button>
                 </div>
                 <div className="mt-6 sm:mt-8 space-y-2">
-                  <p className="text-neutral-500 text-sm">Try it free or let us run everything for you with our Local Pro+ service.</p>
+                  <p className="text-neutral-500 text-sm">Let us handle everything for you with our Local Pro+ service. We'll grow your email list and get you more customers every month...GUARANTEED!</p>
                 </div>
               </div>
             </div>
@@ -832,7 +832,7 @@ const LocalPage = () => {
             </h2>
             
             <p className="text-xl text-purple-100 font-medium max-w-3xl mx-auto mb-10">
-              Try it free or let us run everything for you with our Local Pro+ service.
+              Let us handle everything for you with our Local Pro+ service. We'll grow your email list and get you more customers every month...GUARANTEED!
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
@@ -840,11 +840,11 @@ const LocalPage = () => {
                 to="/register"
                 className="px-8 py-4 text-lg font-medium rounded-full bg-white text-purple-600 hover:bg-gray-100 shadow-xl transition-all duration-300 hover:shadow-2xl transform hover:scale-105"
               >
-                Launch Free Giveaway
+                Book A Call Today
               </Link>
               
               <button className="px-8 py-4 text-lg font-medium rounded-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 transition-all duration-300">
-                Book a Call
+                Try It Yourself
               </button>
             </div>
             
@@ -861,7 +861,7 @@ const LocalPage = () => {
           </div>
         </div>
       </section>
-      <ContactForm color="primary" />
+      <ContactForm color="purple-600" />
     </div>
   );
 };
