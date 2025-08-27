@@ -332,7 +332,7 @@ const InfluencersPage = () => {
       <section
         ref={problemsRef}
         data-section="problemsSection"
-        className="py-24 sm:py-32 bg-gray-50"
+        className=" py-[40px] sm:py-[60px] bg-gray-50"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-16">
@@ -402,7 +402,7 @@ const InfluencersPage = () => {
       <section
         ref={stepsRef}
         data-section="stepsSection"
-        className="py-24 sm:py-32"
+        className=" py-[40px] sm:py-[60px]"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-20">
@@ -458,7 +458,7 @@ const InfluencersPage = () => {
       <section
         ref={featuresRef}
         data-section="featuresSection"
-        className="py-24 sm:py-32 bg-gray-50"
+        className=" py-[40px] sm:py-[60px] bg-gray-50"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-20">
@@ -523,7 +523,7 @@ const InfluencersPage = () => {
       <section
         ref={giveawayIdeasRef}
         data-section="giveawayIdeas"
-        className="py-24 sm:py-32"
+        className=" py-[40px] sm:py-[60px]"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-16">
@@ -559,7 +559,7 @@ const InfluencersPage = () => {
       <section
         ref={testimonialsRef}
         data-section="testimonials"
-        className="py-24 sm:py-32 bg-gray-50"
+        className=" py-[40px] sm:py-[60px] bg-gray-50"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-20">
@@ -615,7 +615,7 @@ const InfluencersPage = () => {
       <section
         ref={trustBuildersRef}
         data-section="trustBuilders"
-        className="py-24 sm:py-32"
+        className=" py-[40px] sm:py-[60px]"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-16">
@@ -680,7 +680,7 @@ const InfluencersPage = () => {
       <section
         ref={faqRef}
         data-section="faq"
-        className="py-24 sm:py-32 bg-gray-50"
+        className=" py-[40px] sm:py-[60px] bg-gray-50"
       >
         <div className="container px-4 sm:px-6 mx-auto">
           <div className="text-center mb-16">
@@ -735,7 +735,7 @@ const InfluencersPage = () => {
       <section
         ref={ctaRef}
         data-section="cta"
-        className="py-24 sm:py-32 bg-gradient-to-br from-pink-600 to-rose-600"
+        className=" py-[40px] sm:py-[60px] bg-gradient-to-br from-pink-600 to-rose-600"
       >
         <div className="container px-4 sm:px-6 mx-auto relative">
           <div 
