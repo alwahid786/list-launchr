@@ -16,7 +16,7 @@ const submitForm = async (req, res) => {
 
     const mailOptions = {
       from: email,
-      to: process.env.EMAIL_USERNAME,
+      to: process.env.EMAIL_USER,
       subject: `New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
       html: `

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { contactAPI } from "@/api";
+import { toast } from "react-hot-toast";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -6,15 +8,32 @@ const ContactForm = () => {
     email: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Send to server:", formData);
-    // TODO: Connect to backend email API
+    setIsSubmitting(true);
+    
+    try {
+      await contactAPI.sendContactMessage(formData);
+      toast.success("Your message has been sent successfully! We'll get back to you soon.");
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        message: ""
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      const errorMessage = error.response?.data?.message || "Failed to send message. Please try again later.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,6 +67,7 @@ const ContactForm = () => {
               type="email"
               name="email"
               value={formData.email}
+              disabled={isSubmitting}
               onChange={handleChange}
               className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
               required
@@ -68,7 +88,8 @@ const ContactForm = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-primary text-white font-semibold hover:opacity-90 transition"
+            disabled={isSubmitting}
+            className={`w-full bg-primary text-white py-3 px-6 rounded-xl font-medium hover:bg-primary/90 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             Send Message
           </button>
