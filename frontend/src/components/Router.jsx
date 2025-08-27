@@ -33,6 +33,7 @@ import LocalPage from '../pages/LocalPage';
 import AuthorsPage from '../pages/AuthorsPage';
 import InfluencersPage from '../pages/InfluencersPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import AboutPage from '../pages/AboutPage';
 
 const Router = () => {
   return (
@@ -55,6 +56,7 @@ const Router = () => {
           <Route path="/influencers" element={<InfluencersPage />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="/giveaway/:slug" element={<GiveawayEntryPage />} />
+          <Route path="/about" element={<AboutPage />} />
         </Route>
 
         {/* Protected routes with dashboard layout */}
