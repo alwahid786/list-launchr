@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ContactForm from '../components/global/ContactForm';
+import BookLaunchImage from "../assets/images/book-launch-giveaway.jpg"
+import DigitalArtCourseImage from "../assets/images/digital-art-course.jpg"
+import FitnessEquipmentPackageImage from "../assets/images/fitness-equipment-package.jpg"
+import PhotographyBundleImage from "../assets/images/photography-course-bundle.jpg"
+import KitchenGadgetBundleImage from "../assets/images/kitchen-gadget-bundle.jpg"
+import SkincareCollectionImage from "../assets/images/skincare-collection.jpg"
 
 const ExamplesPage = () => {
   const [isVisible, setIsVisible] = useState({
@@ -58,7 +64,7 @@ const ExamplesPage = () => {
       id: 1,
       title: 'Book Launch Giveaway',
       description: 'Win a signed copy of "Amazing Book Title" plus exclusive reader bonuses!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Book+Giveaway',
+      image: BookLaunchImage,
       entries: 1432,
       days: 14,
       category: 'books',
@@ -72,7 +78,7 @@ const ExamplesPage = () => {
       id: 2,
       title: 'Photography Course Bundle',
       description: 'Enter to win our complete photography course bundle worth $499!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Photography+Bundle',
+      image: PhotographyBundleImage,
       entries: 2189,
       days: 21,
       category: 'courses',
@@ -86,7 +92,7 @@ const ExamplesPage = () => {
       id: 3,
       title: 'Fitness Equipment Package',
       description: 'Win a complete home gym setup with weights, resistance bands, and more!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Fitness+Package',
+      image: FitnessEquipmentPackageImage,
       entries: 3567,
       days: 30,
       category: 'fitness',
@@ -100,7 +106,7 @@ const ExamplesPage = () => {
       id: 4,
       title: 'Skincare Collection',
       description: 'Win our entire organic skincare collection plus a 1-year subscription!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Skincare+Collection',
+      image: SkincareCollectionImage,
       entries: 1876,
       days: 14,
       category: 'beauty',
@@ -114,7 +120,7 @@ const ExamplesPage = () => {
       id: 5,
       title: 'Kitchen Gadget Bundle',
       description: 'Enter to win a complete set of premium kitchen gadgets worth over $350!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Kitchen+Bundle',
+      image: KitchenGadgetBundleImage,
       entries: 2453,
       days: 21,
       category: 'home',
@@ -128,7 +134,7 @@ const ExamplesPage = () => {
       id: 6,
       title: 'Digital Art Course',
       description: 'Win lifetime access to our premium digital art course and tablet!',
-      image: 'https://placehold.co/600x400/0066FF/FFFFFF?text=Art+Course',
+      image: DigitalArtCourseImage,
       entries: 1245,
       days: 14,
       category: 'courses',
