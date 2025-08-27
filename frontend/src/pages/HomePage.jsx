@@ -826,7 +826,7 @@ const HomePage = () => {
       </section>
 
       {/* Contact Form */}
-      <ContactForm  />
+      <ContactForm color="primary" />
     </div>
   );
 };

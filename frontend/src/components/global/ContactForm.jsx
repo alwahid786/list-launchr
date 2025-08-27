@@ -2,7 +2,7 @@ import { useState } from "react";
 import { contactAPI } from "@/api";
 import { toast } from "react-hot-toast";
 
-const ContactForm = () => {
+const ContactForm = ({color}) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,7 +39,7 @@ const ContactForm = () => {
   return (
     <section className="w-full py-16 bg-gray-50">
       <div className="max-w-4xl mx-auto px-6">
-        <h2 className="text-3xl font-bold text-primary mb-6 text-center">
+        <h2 className={`text-3xl font-bold text-${color} mb-6 text-center`}>
           Contact Us
         </h2>
         <form
@@ -55,7 +55,7 @@ const ContactForm = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none   text-gray-900 border-${color}`}
               required
             />
           </div>
@@ -69,7 +69,7 @@ const ContactForm = () => {
               value={formData.email}
               disabled={isSubmitting}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none   text-gray-900 border-${color}`}
               required
             />
           </div>
@@ -82,14 +82,14 @@ const ContactForm = () => {
               rows="5"
               value={formData.message}
               onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none   text-gray-900 border-${color}`}
               required
             />
           </div>
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full bg-primary text-white py-3 px-6 rounded-xl font-medium hover:bg-primary/90 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full bg-${color} text-white py-3 px-6 rounded-xl font-medium hover:opacity-90 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             Send Message
           </button>

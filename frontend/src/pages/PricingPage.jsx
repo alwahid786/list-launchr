@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import ContactForm from '../components/global/ContactForm';
 
 const PricingPage = () => {
   const { currentUser, isPro } = useAuth();
@@ -518,6 +519,7 @@ const PricingPage = () => {
           </div>
         </div>
       </section>
+      <ContactForm color="primary" />
     </div>
   );
 };

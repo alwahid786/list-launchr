@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import ContactForm from '../components/global/ContactForm';
 
 const LocalPage = () => {
   const [isVisible, setIsVisible] = useState({
@@ -860,6 +861,7 @@ const LocalPage = () => {
           </div>
         </div>
       </section>
+      <ContactForm color="primary" />
     </div>
   );
 };
