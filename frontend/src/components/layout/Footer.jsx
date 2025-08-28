@@ -48,9 +48,8 @@ const Footer = () => {
                   {[
                     { label: 'About Us', path: '/about' },
                     { label: 'Pricing', path: '/pricing' },
-                    { label: 'Blog', path: '/blog' },
-                    { label: 'Careers', path: '/careers' },
-                    { label: 'Contact', path: '/contact' }
+                   
+                    { label: 'Contact', path: '/pricing#contact' }
                   ].map((link, i) => (
                     <li key={i}>
                       <Link 
@@ -69,11 +68,9 @@ const Footer = () => {
                 <h4 className="font-bold mb-6 text-lg">Resources</h4>
                 <ul className="space-y-4">
                   {[
-                    { label: 'Help Center', path: '/help' },
+                    { label: 'Help Center', path: '/examples#advice' },
                     { label: 'Examples', path: '/examples' },
-                    { label: 'Tutorials', path: '/tutorials' },
-                    { label: 'Documentation', path: '/docs' },
-                    { label: 'Webinars', path: '/webinars' }
+       
                   ].map((link, i) => (
                     <li key={i}>
                       <Link 
@@ -88,28 +85,7 @@ const Footer = () => {
                 </ul>
               </div>
               
-              <div>
-                <h4 className="font-bold mb-6 text-lg">Legal</h4>
-                <ul className="space-y-4">
-                  {[
-                    { label: 'Terms of Service', path: '/terms' },
-                    { label: 'Privacy Policy', path: '/privacy' },
-                    { label: 'Cookie Policy', path: '/cookies' },
-                    { label: 'GDPR Compliance', path: '/gdpr' },
-                    { label: 'Accessibility', path: '/accessibility' }
-                  ].map((link, i) => (
-                    <li key={i}>
-                      <Link 
-                        to={link.path} 
-                        className="text-gray-300 hover:text-accent transition-all duration-200 flex items-center group"
-                      >
-                        <span className="h-0.5 w-0 bg-accent mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-300"></span>
-                        <span>{link.label}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+             
             </div>
           </div>
         </div>
@@ -124,11 +100,7 @@ const Footer = () => {
                 &copy; {new Date().getFullYear()} ListLaunchr. All rights reserved.
               </p>
               
-              <div className="flex gap-6">
-                <Link to="/sitemap" className="text-sm text-gray-400 hover:text-accent transition-colors">Sitemap</Link>
-                <Link to="/status" className="text-sm text-gray-400 hover:text-accent transition-colors">Status</Link>
-                <Link to="/changelog" className="text-sm text-gray-400 hover:text-accent transition-colors">Changelog</Link>
-              </div>
+             
             </div>
             
             <div className="flex gap-5 mt-6 md:mt-0">

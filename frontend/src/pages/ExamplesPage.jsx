@@ -416,7 +416,7 @@ const ExamplesPage = () => {
         data-section="tips"
         className="py-24 bg-gray-50"
       >
-        <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
+        <div className="container px-6 sm:px-8 md:px-12 lg:px-16" id="advice">
           <div className={`text-center mb-12 transition-all duration-1000 ${isVisible.tips ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <span className="bg-blue-50 text-primary text-sm font-medium px-4 py-1.5 rounded-full">Expert Advice</span>
             <h2 className="mt-6 text-3xl font-headline font-extrabold text-neutral">
