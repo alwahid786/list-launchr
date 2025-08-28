@@ -486,7 +486,7 @@ const PricingPage = () => {
       <section
         ref={ctaRef}
         data-section="cta"
-        className="py-24 bg-gradient-to-br from-primary to-blue-700"
+        className="py-24 bg-gradient-to-br from-primary to-blue-700" id='launch'
       >
         <div className="container px-6 sm:px-8 md:px-12 lg:px-16">
           <div className={`text-center transition-all duration-1000 ${isVisible.cta ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
